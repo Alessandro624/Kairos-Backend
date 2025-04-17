@@ -2,10 +2,12 @@ package it.unical.demacs.informatica.KairosBackend.data.entities.embeddables;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,4 +17,3 @@ public class Address
     private String city;
     private String zipCode;
 }
-

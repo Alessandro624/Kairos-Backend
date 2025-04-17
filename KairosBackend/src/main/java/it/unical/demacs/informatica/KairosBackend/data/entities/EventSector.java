@@ -1,27 +1,32 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
+import java.math.BigDecimal;
+import java.util.UUID;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class EventSector
 {
     @Id
-    @UuidGenerator
     @GeneratedValue
+    @UuidGenerator
     @Column(name = "ID")
-    private Long id;
+    private UUID id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "EVENT_ID")
     private Event event;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SECTOR_ID")
     private Sector sector;
 
-    @Column(name = "PRICE")
-    private float price;
+    @Column(name = "PRICE", precision = 10, scale = 2)
+    private BigDecimal price;
 }

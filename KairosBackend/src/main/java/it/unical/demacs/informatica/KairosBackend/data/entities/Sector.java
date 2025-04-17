@@ -1,23 +1,28 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
+import java.util.UUID;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 @Entity
 public class Sector
 {
     @Id
-    @UuidGenerator
     @GeneratedValue
+    @UuidGenerator
     @Column(name = "ID")
-    private Long id;
+    private UUID id;
 
     @Column(name = "NAME")
     private String name;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "STRUCTURE_ID")
     private Structure structure;
 

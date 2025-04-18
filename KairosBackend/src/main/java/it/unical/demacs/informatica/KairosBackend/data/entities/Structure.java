@@ -28,7 +28,7 @@ public class Structure
     @AttributeOverrides ({
             @AttributeOverride(name = "street", column = @Column(name = "ADDRESS_STREET")),
             @AttributeOverride(name = "city", column = @Column(name = "ADDRESS_CITY")),
-            @AttributeOverride(name = "zipCode", column = @Column(name = "ADDRESS_ZIP"))
+            @AttributeOverride(name = "zipCode", column = @Column(name = "ADDRESS_ZIPCODE"))
     })
     private Address address;
 

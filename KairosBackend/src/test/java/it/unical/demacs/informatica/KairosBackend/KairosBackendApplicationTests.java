@@ -6,10 +6,15 @@ import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.io.IOException;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -23,5 +28,10 @@ class KairosBackendApplicationTests {
 
 	public KairosBackendApplicationTests(WishlistRepository wishlistRepository) {
 		this.wishlistRepository = wishlistRepository;
+	}
+
+	@BeforeAll
+	public void createDbTest() throws IOException {
+		CsvParser
 	}
 }

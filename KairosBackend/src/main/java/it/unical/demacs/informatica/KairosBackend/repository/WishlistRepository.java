@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Repository
 public interface WishlistRepository extends ListCrudRepository<Wishlist, UUID>{
-    List<Wishlist> findByOwnerId(UUID ownerId);
+    List<Wishlist> findByCreatorId(UUID creatorId);
     List<Wishlist> findByNameContaining(String name);
 
     List<Wishlist> findBySharedUsers_id(UUID userId);

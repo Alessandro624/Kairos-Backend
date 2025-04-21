@@ -16,7 +16,7 @@ public class EventSector
     @Id
     @GeneratedValue
     @UuidGenerator
-    @Column(name = "ID")
+    @Column(name = "ID", nullable = false, unique = true, updatable = false, length = 36)
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)

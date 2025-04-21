@@ -1,6 +1,7 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 import java.util.UUID;
@@ -16,16 +17,17 @@ public class Sector
     @Id
     @GeneratedValue
     @UuidGenerator
-    @Column(name = "ID")
+    @Column(name = "ID", nullable = false, unique = true, updatable = false, length = 36)
     private UUID id;
 
-    @Column(name = "NAME")
+    @Column(name = "NAME", nullable = false, length = 50)
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "STRUCTURE_ID")
+    @JoinColumn(name = "STRUCTURE_ID", nullable = false)
     private Structure structure;
 
-    @Column(name = "CAPACITY")
+    @Min(0)
+    @Column(name = "CAPACITY", nullable = false)
     private Integer capacity;
 }

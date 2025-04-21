@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class StructureServiceImpl implements StructureService
 {
     private final StructureRepository structureRepository;

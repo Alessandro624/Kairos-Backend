@@ -4,7 +4,8 @@ import it.unical.demacs.informatica.KairosBackend.data.entities.embeddables.Addr
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
-import java.util.Set;
+
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -18,10 +19,10 @@ public class Structure
     @Id
     @GeneratedValue
     @UuidGenerator
-    @Column(name = "ID")
+    @Column(name = "ID", nullable = false, unique = true, updatable = false, length = 36)
     private UUID id;
 
-    @Column(name = "NAME")
+    @Column(name = "NAME", nullable = false, length = 50)
     private String name;
 
     @Embedded
@@ -33,5 +34,5 @@ public class Structure
     private Address address;
 
     @OneToMany(mappedBy = "structure", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Sector> sectors;
+    private List<Sector> sectors;
 }

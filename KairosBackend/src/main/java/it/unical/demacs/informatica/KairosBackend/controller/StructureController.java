@@ -2,6 +2,7 @@ package it.unical.demacs.informatica.KairosBackend.controller;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.Structure;
 import it.unical.demacs.informatica.KairosBackend.data.entities.dto.StructureDTO;
+import it.unical.demacs.informatica.KairosBackend.repository.StructureRepository;
 import it.unical.demacs.informatica.KairosBackend.service.StructureService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,8 +12,8 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/structures")
-@RequiredArgsConstructor
+@RequestMapping(path = "/api/structures",  produces = "application/json")
+@CrossOrigin(origins = "http://localhost:8080" )
 public class StructureController
 {
     private final StructureService structureService;

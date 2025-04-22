@@ -25,9 +25,9 @@ public interface WishlistRepository extends ListCrudRepository<Wishlist, UUID>, 
 
     Integer countByCreator_Id(UUID creatorId);
 
-    Page<Wishlist> findByCreator_Id(UUID creatorID, Pageable pageable);
-    Page<Wishlist> findByNameContaining(String name, Pageable pageable);
+    Page<Wishlist> findAllByCreator_Id(UUID creatorID, Pageable pageable);
+    Page<Wishlist> findAllByNameContaining(String name, Pageable pageable);
 
     @Query("SELECT w from Wishlist w JOIN w.sharedUsers wu WHERE wu.id = :userId")
-    Page<Wishlist> findBySharedUser(@Param("userId") UUID user, Pageable pageable);
+    Page<Wishlist> findAllBySharedUser(@Param("userId") UUID user, Pageable pageable);
 }

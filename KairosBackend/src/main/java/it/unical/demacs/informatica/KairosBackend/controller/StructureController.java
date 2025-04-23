@@ -29,7 +29,8 @@ public class StructureController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Structure> getStructure(@PathVariable UUID id) {
+    public ResponseEntity<Structure> getStructure(@PathVariable UUID id)
+    {
         logger.info("Richiesta per ottenere la struttura con ID: {}", id);
         return structureService.getStructureById(id)
                 .map(structure -> {

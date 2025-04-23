@@ -1,10 +1,13 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities.dto.wishlist;
 
+import it.unical.demacs.informatica.KairosBackend.data.entities.Event;
+import it.unical.demacs.informatica.KairosBackend.data.entities.User;
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.WishlistScope;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -12,6 +15,7 @@ import java.util.UUID;
 
 //MAIN DTO RETURNED TO FRONTEND
 @Data
+@NoArgsConstructor
 public class WishlistDTO {
 
     @NotNull(message = "Id must be defined")
@@ -33,4 +37,13 @@ public class WishlistDTO {
     private List<EventWishlistDTO> wishedEvents;
 
     private List<UserWishlistDTO> sharedUsers;
+
+    //used mainly for testing (maybe)
+    public void addWishedEvent(EventWishlistDTO e){
+        wishedEvents.add(e);
+    }
+
+    public void addSharedUser(UserWishlistDTO u){
+        sharedUsers.add(u);
+    }
 }

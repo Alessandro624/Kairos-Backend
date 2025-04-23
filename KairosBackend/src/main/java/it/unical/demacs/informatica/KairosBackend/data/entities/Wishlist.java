@@ -53,14 +53,5 @@ public class Wishlist {
             inverseJoinColumns = @JoinColumn(name="user_id", nullable=false)
     )
     private List<User> sharedUsers;
-
-    //used mainly for testing (maybe)
-    public void addWishedEvent(Event e){
-        wishedEvents.add(e);
-    }
-
-    public void addSharedUser(User u){
-        sharedUsers.add(u);
-    }
 }
 

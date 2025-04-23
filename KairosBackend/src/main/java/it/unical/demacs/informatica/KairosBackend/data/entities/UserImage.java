@@ -1,7 +1,6 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.UUID;
@@ -15,10 +14,9 @@ import java.util.UUID;
 public class UserImage {
     @Id
     @GeneratedValue
-    @Column(name = "id", updatable = false, nullable = false, unique = true)
+    @Column(name = "id", length = 36, nullable = false, updatable = false, unique = true, columnDefinition = "UUID")
     private UUID id;
 
-    @NotBlank(message = "Photo url cannot be blank")
     @Column(name = "photo_url", nullable = false)
     private String photoUrl;
 

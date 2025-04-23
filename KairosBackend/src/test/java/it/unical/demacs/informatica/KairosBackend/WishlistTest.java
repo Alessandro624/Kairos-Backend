@@ -1,11 +1,7 @@
 package it.unical.demacs.informatica.KairosBackend;
 
-import it.unical.demacs.informatica.KairosBackend.data.entities.Wishlist;
-import it.unical.demacs.informatica.KairosBackend.repository.WishlistRepository;
-import it.unical.demacs.informatica.KairosBackend.service.WishlistService;
+import it.unical.demacs.informatica.KairosBackend.data.services.WishlistService;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 public class WishlistTest extends KairosBackendApplicationTests {
 

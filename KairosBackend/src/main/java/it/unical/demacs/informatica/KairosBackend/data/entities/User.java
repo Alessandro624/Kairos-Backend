@@ -1,5 +1,6 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities;
 
+import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Provider;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -11,10 +12,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.List;
 import java.util.UUID;
 
 // TODO add interface UserDetails for Spring Security
-// TODO min and max size for strings
 
 @Data
 @AllArgsConstructor
@@ -61,32 +62,32 @@ public class User {
     @Column(name = "email_verified", nullable = false)
     private boolean emailVerified;
 
-    // TODO role mapping
+    // TODO role mapping -> it can be handled as list of roles ?
     // @Enumerated(EnumType.STRING)
     // @NotNull(message = "Role cannot be null")
     // @Column(name = "role", nullable = false)
     // private UserRole role;
 
-    // TODO authentication provider mapping
-    // @NotNull(message = "Authentication provider cannot be null")
-    // @Enumerated(EnumType.STRING)
-    // @Column(name = "provider", nullable = false)
-    // private Provider provider;
+    @NotNull(message = "Authentication provider cannot be null")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider", nullable = false)
+    private Provider provider;
 
-    // TODO mapping with profile image
-    // @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    // private UserImage profileImage;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserImage profileImage;
 
-    // TODO wishlist mapping
-    // @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    // private List<Wishlist> wishlists;
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Wishlist> wishlists;
+
+    @ManyToMany(mappedBy = "sharedUsers")
+    private List<Wishlist> sharedWishlists;
 
     // TODO tickets mapping (only role == PARTICIPANT)
     // @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     // private List<Ticket> tickets;
 
     // TODO events mapping (only role == ORGANIZER)
-    // @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    // @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL, orphanRemoval = true)
     // private List<Event> events;
 
     // TODO implement UserDetails methods

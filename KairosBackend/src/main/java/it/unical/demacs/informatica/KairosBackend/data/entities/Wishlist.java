@@ -33,8 +33,8 @@ public class Wishlist {
 
     //TODO add list of created wishlists in User entity
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable=false)
-    private User owner;
+    @JoinColumn(name = "creator_id", nullable=false)
+    private User creator;
 
     //TODO add list of wishlists in Event entity
     @ManyToMany()

@@ -12,8 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface WishlistService {
-
-    void saveWishlist(WishlistDTO wishlistDTO, UUID creatorId);
+    void saveWishlist(WishlistDTO wishlistDTO);
     void deleteWishlist(UUID wishlistId);
     void updateWishlist(EditWishlistDTO editWishlistDTO);
 
@@ -22,6 +21,8 @@ public interface WishlistService {
 
     void addEventToWishlist(UUID wishlistId, EventWishlistDTO eventId);
     void removeEventFromWishlist(UUID wishlistId, UUID userId);
+
+    int countWishlistsByCreator(UUID creatorId);
 
     //TODO improve methods: a single method with a filter (private, shared, both) should be better
     //get created wishlists
@@ -33,5 +34,4 @@ public interface WishlistService {
 
     //get all wishlists: shared and private
     Page<WishlistDTO> getWishlists(UUID creatorId, Integer page, Integer size);
-    int countWishlistsByCreator(UUID creatorId);
 }

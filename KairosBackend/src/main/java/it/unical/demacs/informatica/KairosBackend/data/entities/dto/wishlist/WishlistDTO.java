@@ -1,18 +1,17 @@
-package it.unical.demacs.informatica.KairosBackend.data.entities.dto;
+package it.unical.demacs.informatica.KairosBackend.data.entities.dto.wishlist;
 
-import it.unical.demacs.informatica.KairosBackend.data.entities.Event;
-import it.unical.demacs.informatica.KairosBackend.data.entities.User;
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.WishlistScope;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import org.hibernate.annotations.UuidGenerator;
+import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+//MAIN DTO RETURNED TO FRONTEND
+@Data
 public class WishlistDTO {
 
     @NotNull(message = "Id must be defined")
@@ -28,14 +27,10 @@ public class WishlistDTO {
     @NotNull(message = "Scope must be defined")
     private WishlistScope scope;
 
-    //TODO add UserDTO
-    //@NotNull(message = "Creator must be defined")
-    //private UserDTO creator;
+    @NotNull(message = "Creator must be defined")
+    private UserWishlistDTO creator;
 
-    //TODO add EventDTO
-    //private List<EventDTO> wishedEvents;
+    private List<EventWishlistDTO> wishedEvents;
 
-    //TODO add UserDTO
-    //private List<UserDTO> sharedUsers;
-
+    private List<UserWishlistDTO> sharedUsers;
 }

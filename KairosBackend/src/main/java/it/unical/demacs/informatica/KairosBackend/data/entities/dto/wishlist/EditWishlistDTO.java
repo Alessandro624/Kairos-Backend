@@ -10,9 +10,7 @@ import lombok.Data;
 @Data
 public class EditWishlistDTO {
     @Size(min = 2, max = 50, message = "Name length must be between 2 and 50.")
-    @NotBlank(message = "Name must be defined")
     private String name;
 
-    @NotNull(message = "Scope must be defined")
     private WishlistScope scope;
 }

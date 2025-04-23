@@ -13,9 +13,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping(path = "/api/structures", produces = "application/json")
 @CrossOrigin(origins = "http://localhost:8080")
-public class StructureController {
+public class StructureController
+{
     private final StructureService structureService;
-
     private static final Logger logger = LoggerFactory.getLogger(StructureController.class);
 
     public StructureController(StructureService structureService) {

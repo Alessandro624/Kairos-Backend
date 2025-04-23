@@ -1,7 +1,12 @@
 package it.unical.demacs.informatica.KairosBackend;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.Wishlist;
+import it.unical.demacs.informatica.KairosBackend.data.entities.dto.wishlist.EventWishlistDTO;
+import it.unical.demacs.informatica.KairosBackend.data.entities.dto.wishlist.UserWishlistDTO;
+import it.unical.demacs.informatica.KairosBackend.data.entities.dto.wishlist.WishlistDTO;
+import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.WishlistScope;
 import it.unical.demacs.informatica.KairosBackend.repository.WishlistRepository;
+import it.unical.demacs.informatica.KairosBackend.service.WishlistService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.apache.commons.csv.CSVFormat;
@@ -23,12 +28,12 @@ class KairosBackendApplicationTests {
 	@Value("classpath:data/wishlists.csv")
 	private Resource wishlists;
 
-	//FIXME use directly with services
 	//package visibility:
-	WishlistRepository wishlistRepository;
+	WishlistService wishlistService;
 
-	public KairosBackendApplicationTests(WishlistRepository wishlistRepository) {
-		this.wishlistRepository = wishlistRepository;
+	//TODO change strategy. The constructor will be too long
+	public KairosBackendApplicationTests(WishlistService wishlistService) {
+		this.wishlistService = wishlistService;
 	}
 
 	private static boolean isInitialized = false;
@@ -45,13 +50,13 @@ class KairosBackendApplicationTests {
 
 			for(CSVRecord record : wishlistCsv) {
 				//FIXME use reflection, a layer supertype(maybe?) and a single method 'insertData' for better code (no repetition)
-				insertWishlist(record.get(0), record.get(1), record.get(2), record.get(3), record.get(4), record.get(5));
+				insertWishlistInDB(record.get(0), record.get(1), record.get(2), record.get(3), record.get(4), record.get(5));
 			}
 			isInitialized = true;
 		}
 	}
 
-	private static void insertWishlist(
+	private void insertWishlistInDB(
 			String name,
 			String creationDate,
 			String scope,
@@ -59,33 +64,31 @@ class KairosBackendApplicationTests {
 			String wishedEvents,
 			String sharedUsers
 	) {
-		Wishlist wishlist = new Wishlist();
-		wishlist.setName(name);
-		wishlist.setCreationDate(LocalDate.parse(creationDate));
-		//TODO add creator
-		//wishlist.setCreator(userRepository.findById(UUID.fromString(creator)));
+		WishlistDTO wishlistDTO = new WishlistDTO();
+		wishlistDTO.setName(name);
+		wishlistDTO.setCreationDate(LocalDate.parse(creationDate));
+		wishlistDTO.setScope(WishlistScope.valueOf(scope));
 
-		//TODO add n-m relations
-		/*
-		WISHED EVENTS
+		//creator
+		UserWishlistDTO creatorDTO = new UserWishlistDTO();
+		creatorDTO.setUsername(creator);
+		wishlistDTO.setCreator(creatorDTO);
 
+		//wished events
 		String[] wishedEventsArray = wishedEvents.split("-");
         for (String event: wishedEventsArray) {
-      		Event event = eventRepository.findById(UUID.fromString(event)));
-      		wishlist.addWishedEvent(event);
+			EventWishlistDTO eventWishlistDTO = new EventWishlistDTO();
+			  eventWishlistDTO.setName(event);
+			  wishlistDTO.addWishedEvent(eventWishlistDTO);
     	}
-		*/
-
-		/*
-		SHARED USERS
 
 		String[] sharedUsersArray = sharedUsers.split("-");
         for (String user: sharedUsersArray) {
-      		User user = userRepository.findById(UUID.fromString(user)));
-			wishlist.addSharedUser(user).
+			UserWishlistDTO userWishlistDTO = new UserWishlistDTO();
+			userWishlistDTO.setUsername(user);
+			wishlistDTO.addSharedUser(userWishlistDTO);
     	}
-		*/
 
-		//wishlistRepository.save(wishlist)
+		wishlistService.saveWishlist(wishlistDTO);
 	}
 }

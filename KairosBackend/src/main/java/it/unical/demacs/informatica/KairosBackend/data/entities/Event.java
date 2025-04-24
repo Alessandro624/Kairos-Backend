@@ -53,5 +53,5 @@ public class Event {
     //
 
 
-    //private List<EventImage> images;
+    private List<EventImage> images;
 }

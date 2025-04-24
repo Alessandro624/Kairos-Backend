@@ -1,5 +1,6 @@
 package it.unical.demacs.informatica.KairosBackend.data.services;
 
+import it.unical.demacs.informatica.KairosBackend.data.repository.specifications.WishlistFilter;
 import it.unical.demacs.informatica.KairosBackend.dto.wishlist.EditWishlistDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.wishlist.EventWishlistDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.wishlist.UserWishlistDTO;
@@ -28,12 +29,13 @@ public interface WishlistService {
     //TODO improve methods: a single method with a filter (private, shared, both) should be better
     //get created wishlists
     Page<WishlistDTO> getCreatorWishlists(UUID creatorId, Integer page, Integer size);
-
     Page<WishlistDTO> getCreatorWishlists(String pattern, UUID creatorId, Integer page, Integer size);
-
     //intended as "wishlists shared from others"
     Page<WishlistDTO> getSharedWishlists(UUID creatorId, Integer page, Integer size);
-
     //get all wishlists: shared and private
     Page<WishlistDTO> getWishlists(UUID creatorId, Integer page, Integer size);
+
+    //!!! HERE IT IS!
+    //FIXME is WishlistFilter a DTO?
+    Page<WishlistDTO> getFilteredWishlists(WishlistFilter wishlistFilter, Integer page, Integer size);
 }

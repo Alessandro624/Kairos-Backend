@@ -15,7 +15,6 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 public class Wishlist {
-    //nota: i controlli (null, min, max...) a quanto pare converrebbe inserirli direttamente nei DTO.
     @Id
     @UuidGenerator
     @Column(name="id", nullable=false, unique=true, updatable=false,length=36)
@@ -45,7 +44,6 @@ public class Wishlist {
     )
     private List<Event> wishedEvents;
 
-    //TODO change @OneToMany in @ManyToMany in User entity
     @ManyToMany
     @JoinTable(
             name="wishlist_user",

@@ -1,6 +1,6 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities;
 
-import it.unical.demacs.informatica.KairosBackend.data.EventImage;
+import it.unical.demacs.informatica.KairosBackend.data.entities.EventImage;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;

@@ -1,8 +1,6 @@
-package it.unical.demacs.informatica.KairosBackend.data.entities.dto.wishlist;
+package it.unical.demacs.informatica.KairosBackend.dto.wishlist;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.WishlistScope;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 

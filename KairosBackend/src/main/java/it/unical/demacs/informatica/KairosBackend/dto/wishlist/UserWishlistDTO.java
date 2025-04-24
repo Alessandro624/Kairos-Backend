@@ -1,4 +1,4 @@
-package it.unical.demacs.informatica.KairosBackend.data.entities.dto.wishlist;
+package it.unical.demacs.informatica.KairosBackend.dto.wishlist;
 
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;

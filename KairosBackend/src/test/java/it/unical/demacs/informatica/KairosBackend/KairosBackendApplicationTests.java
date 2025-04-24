@@ -1,8 +1,8 @@
 package it.unical.demacs.informatica.KairosBackend;
 
-import it.unical.demacs.informatica.KairosBackend.data.entities.dto.wishlist.EventWishlistDTO;
-import it.unical.demacs.informatica.KairosBackend.data.entities.dto.wishlist.UserWishlistDTO;
-import it.unical.demacs.informatica.KairosBackend.data.entities.dto.wishlist.WishlistDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.wishlist.EventWishlistDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.wishlist.UserWishlistDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.wishlist.WishlistDTO;
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.WishlistScope;
 import it.unical.demacs.informatica.KairosBackend.data.services.WishlistService;
 import org.junit.jupiter.api.BeforeEach;

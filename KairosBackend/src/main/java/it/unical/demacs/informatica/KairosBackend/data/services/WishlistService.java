@@ -1,9 +1,9 @@
 package it.unical.demacs.informatica.KairosBackend.data.services;
 
-import it.unical.demacs.informatica.KairosBackend.data.entities.dto.wishlist.EditWishlistDTO;
-import it.unical.demacs.informatica.KairosBackend.data.entities.dto.wishlist.EventWishlistDTO;
-import it.unical.demacs.informatica.KairosBackend.data.entities.dto.wishlist.UserWishlistDTO;
-import it.unical.demacs.informatica.KairosBackend.data.entities.dto.wishlist.WishlistDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.wishlist.EditWishlistDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.wishlist.EventWishlistDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.wishlist.UserWishlistDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.wishlist.WishlistDTO;
 import org.springframework.data.domain.Page;
 
 import java.util.UUID;

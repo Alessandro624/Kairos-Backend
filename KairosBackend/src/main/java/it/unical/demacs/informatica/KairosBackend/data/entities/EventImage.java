@@ -1,6 +1,5 @@
-package it.unical.demacs.informatica.KairosBackend.data;
+package it.unical.demacs.informatica.KairosBackend.data.entities;
 
-import it.unical.demacs.informatica.KairosBackend.data.entities.Event;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,6 +1,8 @@
 package it.unical.demacs.informatica.KairosBackend.data.repository;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,7 +15,15 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     Optional<User> findByEmail(String email);
 
-    // TODO find all by role ?
+    boolean existsByUsername(String username);
 
-    // TODO find all using Pageable ?
+    boolean existsByEmail(String email);
+
+    // TODO maybe adding a findByUsernameOrEmail
+
+    // TODO it can be useful for a cleaning scheduler
+    Page<User> findByEmailVerifiedFalse(Pageable pageable);
+
+    // TODO find all by role ?
+    // Page<User> findByRole(UserRole provider, Pageable pageable);
 }

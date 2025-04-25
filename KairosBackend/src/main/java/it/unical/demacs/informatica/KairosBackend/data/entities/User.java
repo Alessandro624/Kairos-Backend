@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 // TODO add interface UserDetails for Spring Security
+// TODO think of using Set instead of List
 
 @Data
 @AllArgsConstructor
@@ -69,7 +70,7 @@ public class User {
     // @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     // private List<Ticket> tickets;
 
-    // TODO events mapping (only role == ORGANIZER)
+    // TODO events mapping (only role == ORGANIZER), needs to be a @ManyToOne on event side
     // @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL, orphanRemoval = true)
     // private List<Event> events;
 

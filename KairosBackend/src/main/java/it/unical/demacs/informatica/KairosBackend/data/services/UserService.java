@@ -1,7 +1,7 @@
 package it.unical.demacs.informatica.KairosBackend.data.services;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.User;
-import it.unical.demacs.informatica.KairosBackend.dto.UserDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.user.UserDTO;
 
 import java.util.List;
 import java.util.Optional;

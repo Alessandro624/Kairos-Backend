@@ -38,7 +38,6 @@ public class User {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    // TODO password validation with custom annotation
     @Column(name = "password", nullable = false)
     private String password;
 

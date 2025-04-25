@@ -1,6 +1,6 @@
 package it.unical.demacs.informatica.KairosBackend.data.services;
 
-import it.unical.demacs.informatica.KairosBackend.dto.UserImageDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.user.UserImageDTO;
 
 import java.util.Optional;
 import java.util.UUID;

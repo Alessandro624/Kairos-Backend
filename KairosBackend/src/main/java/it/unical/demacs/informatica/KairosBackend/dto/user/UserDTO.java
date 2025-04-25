@@ -1,4 +1,4 @@
-package it.unical.demacs.informatica.KairosBackend.dto;
+package it.unical.demacs.informatica.KairosBackend.dto.user;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Provider;
 import jakarta.validation.constraints.Email;
@@ -32,7 +32,6 @@ public class UserDTO {
     @NotBlank(message = "Email cannot be blank")
     private String email;
 
-    // TODO phone number validation
     private String phoneNumber;
 
     // @NotNull(message = "Role cannot be null")

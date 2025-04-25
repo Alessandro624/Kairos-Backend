@@ -10,4 +10,8 @@ import java.util.UUID;
 @Repository
 public interface UserImageRepository extends JpaRepository<UserImage, UUID> {
     Optional<UserImage> findByUserId(UUID userId);
+
+    boolean existsByUserId(UUID userId);
+
+    void deleteByUserId(UUID userId);
 }

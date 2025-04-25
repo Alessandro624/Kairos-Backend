@@ -1,7 +1,9 @@
 package it.unical.demacs.informatica.KairosBackend.data.services;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.User;
+import it.unical.demacs.informatica.KairosBackend.dto.user.UserCreateDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.user.UserDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.user.UserUpdateDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,10 +16,9 @@ public interface UserService {
 
     Optional<UserDTO> findByEmail(String email);
 
-    UserDTO updateUser(UUID userId, UserDTO userDTO);
+    UserDTO updateUser(UUID userId, UserUpdateDTO userDTO);
 
-    // TODO maybe using another DTO for registration
-    UserDTO createUser(UserDTO userDTO);
+    UserDTO createUser(UserCreateDTO userDTO);
 
     // TODO maybe using pageable
     List<User> findAllUsersAdmin();

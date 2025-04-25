@@ -4,6 +4,8 @@ import it.unical.demacs.informatica.KairosBackend.data.entities.User;
 import it.unical.demacs.informatica.KairosBackend.dto.user.UserCreateDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.user.UserDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.user.UserUpdateDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,16 +18,28 @@ public interface UserService {
 
     Optional<UserDTO> findByEmail(String email);
 
+    // TODO maybe a findByUsernameOrEmail for login ?
+
+    // TODO throws UserNotFoundException
     UserDTO updateUser(UUID userId, UserUpdateDTO userDTO);
 
+    // TODO update password maybe with another DTO (oldPass, newPass, confPass), using a token based mechanism?
+
+    // TODO token based mechanism for email verification
+
+    // TODO authentication using a UserAuthDTO with usernameOrEmail and a password field ?
+
+    // TODO throws UserAlreadyExistsException
     UserDTO createUser(UserCreateDTO userDTO);
 
-    // TODO maybe using pageable
-    List<User> findAllUsersAdmin();
+    Page<UserDTO> findAllUsersAdmin(Pageable pageable);
 
-    // TODO maybe using pageable
-    List<UserDTO> findAllUsers();
+    Page<UserDTO> findAllUsers(Pageable pageable);
 
-    // TODO only if needed
+    // TODO only if needed, throws UserNotFoundException
     void deleteUser(UUID userId);
+
+    boolean existsUsername(String username);
+
+    boolean existsEmail(String email);
 }

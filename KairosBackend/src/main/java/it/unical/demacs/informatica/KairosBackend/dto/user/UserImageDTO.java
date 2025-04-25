@@ -1,4 +1,4 @@
-package it.unical.demacs.informatica.KairosBackend.dto;
+package it.unical.demacs.informatica.KairosBackend.dto.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

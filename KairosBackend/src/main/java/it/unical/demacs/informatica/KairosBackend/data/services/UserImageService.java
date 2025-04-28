@@ -11,15 +11,11 @@ public interface UserImageService {
 
     Optional<UserImageDTO> findUserImageByUserId(UUID userId);
 
-    // TODO throws UserNotFoundException if user not exists
     UserImageDTO saveUserImage(UUID userId, UserImageDTO userImageDTO);
 
-    // TODO throws UserNotFoundException if user not exists or an exception for file errors
     UserImageDTO uploadUserImage(UUID userId, MultipartFile file);
 
-    // TODO throws UserImageNotFoundException
     void deleteUserImage(UUID imageId);
 
-    // TODO throws UserNotFoundException
     void deleteUserImageByUserId(UUID userId);
 }

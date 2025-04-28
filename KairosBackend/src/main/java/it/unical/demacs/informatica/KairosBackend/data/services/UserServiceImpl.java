@@ -77,6 +77,7 @@ public class UserServiceImpl implements UserService {
         newUser.setEmailVerified(false);
         newUser.setProvider(Provider.LOCAL);
         // TODO handle Role
+        newUser.setRole(UserRole.USER);
         User savedUser = userRepository.save(newUser);
         // TODO send verification email or handle it with another service
         // TODO handle other object creations

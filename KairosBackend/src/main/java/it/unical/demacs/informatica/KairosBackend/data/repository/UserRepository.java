@@ -25,5 +25,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     // TODO it can be useful for a cleaning scheduler
     Page<User> findAllByEmailVerifiedFalse(Pageable pageable);
 
-    Page<User> findAllByRole(UserRole provider, Pageable pageable);
+    Page<User> findAllByRole(UserRole role, Pageable pageable);
 }

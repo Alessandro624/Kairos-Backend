@@ -1,5 +1,6 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities;
 
+import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Category;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -29,6 +30,10 @@ public class Event {
     @Size(min = 1, max = 1000)
     @Column(name = "description", nullable = false)
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category", nullable = false)
+    private Category category;
 
     @Column(name = "datetime", nullable = false)
     private LocalDateTime dateTime;

@@ -1,9 +1,11 @@
 package it.unical.demacs.informatica.KairosBackend.data.services;
 
-import it.unical.demacs.informatica.KairosBackend.data.entities.User;
-import it.unical.demacs.informatica.KairosBackend.dto.UserDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.user.UserCreateDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.user.UserDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.user.UserUpdateDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,17 +16,25 @@ public interface UserService {
 
     Optional<UserDTO> findByEmail(String email);
 
-    UserDTO updateUser(UUID userId, UserDTO userDTO);
+    // TODO maybe a findByUsernameOrEmail for login ?
 
-    // TODO maybe using another DTO for registration
-    UserDTO createUser(UserDTO userDTO);
+    UserDTO updateUser(UUID userId, UserUpdateDTO userDTO);
 
-    // TODO maybe using pageable
-    List<User> findAllUsersAdmin();
+    // TODO update password maybe with another DTO (oldPass, newPass, confPass), using a token based mechanism?
 
-    // TODO maybe using pageable
-    List<UserDTO> findAllUsers();
+    // TODO token based mechanism for email verification
 
-    // TODO only if needed
+    // TODO authentication using a UserAuthDTO with usernameOrEmail and a password field ?
+
+    UserDTO createUser(UserCreateDTO userDTO);
+
+    Page<UserDTO> findAllUsersAdmin(Pageable pageable);
+
+    Page<UserDTO> findAllUsers(Pageable pageable);
+
     void deleteUser(UUID userId);
+
+    boolean existsUsername(String username);
+
+    boolean existsEmail(String email);
 }

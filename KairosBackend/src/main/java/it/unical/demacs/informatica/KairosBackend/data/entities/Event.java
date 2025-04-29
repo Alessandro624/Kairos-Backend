@@ -1,6 +1,5 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities;
 
-import it.unical.demacs.informatica.KairosBackend.data.EventImage;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -38,7 +37,7 @@ public class Event {
     private LocalDateTime dateTime;
 
     @Size(min=1)
-    @Column(name = "title", nullable = false)
+    @Column(name = "maxparticipants", nullable = false)
     private int maxParticipants;
 
     @OneToOne(fetch = FetchType.LAZY)

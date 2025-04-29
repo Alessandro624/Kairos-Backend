@@ -45,6 +45,9 @@ public class Event {
     @JoinColumn(name = "id_structure")
     private Structure structure;
 
+    @OneToMany(mappedBy = "eventsector")
+    private List<EventSector> sectors;
+
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EventImage> images;
 }

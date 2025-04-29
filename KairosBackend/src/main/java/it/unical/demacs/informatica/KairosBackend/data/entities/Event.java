@@ -23,16 +23,13 @@ public class Event {
     private UUID id;
 
     @Size(min = 1, max = 100)
-    @NonNull
     @Column(name = "title", nullable = false)
     private String title;
 
     @Size(min = 1, max = 1000)
-    @NonNull
     @Column(name = "description", nullable = false)
     private String description;
 
-    @NonNull
     @Column(name = "datetime", nullable = false)
     private LocalDateTime dateTime;
 

@@ -2,8 +2,6 @@ package it.unical.demacs.informatica.KairosBackend.controller;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.Structure;
 import it.unical.demacs.informatica.KairosBackend.data.services.StructureService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

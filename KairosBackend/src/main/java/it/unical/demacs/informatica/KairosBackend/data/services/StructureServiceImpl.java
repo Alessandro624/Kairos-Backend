@@ -11,33 +11,39 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class StructureServiceImpl implements StructureService {
+public class StructureServiceImpl implements StructureService
+{
     private final StructureRepository structureRepository;
     private final ApplicationEventPublisher publisher;
 
-    public StructureServiceImpl(StructureRepository structureRepository, ApplicationEventPublisher publisher) {
+    public StructureServiceImpl(StructureRepository structureRepository, ApplicationEventPublisher publisher)
+    {
         this.structureRepository = structureRepository;
         this.publisher = publisher;
     }
 
     @Override
-    public List<Structure> getAllStructures() {
+    public List<Structure> getAllStructures()
+    {
         return structureRepository.findAll();
     }
 
     @Override
-    public Optional<Structure> getStructureById(UUID id) {
+    public Optional<Structure> getStructureById(UUID id)
+    {
         publisher.publishEvent(new getStructureByIdEvent(id));
         return structureRepository.findById(id);
     }
 
     @Override
-    public Structure saveStructure(Structure structure) {
+    public Structure saveStructure(Structure structure)
+    {
         return structureRepository.save(structure);
     }
 
     @Override
-    public void deleteStructure(UUID id) {
+    public void deleteStructure(UUID id)
+    {
         structureRepository.deleteById(id);
     }
 }

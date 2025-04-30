@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface StructureService {
+public interface StructureService
+{
     @Cacheable("allStructure")
     List<Structure> getAllStructures();
 

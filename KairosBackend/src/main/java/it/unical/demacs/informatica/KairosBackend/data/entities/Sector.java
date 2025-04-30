@@ -17,17 +17,17 @@ public class Sector
     @Id
     @GeneratedValue
     @UuidGenerator
-    @Column(name = "ID", nullable = false, unique = true, updatable = false, length = 36)
+    @Column(name = "id", nullable = false, unique = true, updatable = false, length = 36)
     private UUID id;
 
-    @Column(name = "NAME", nullable = false, length = 50)
+    @Column(name = "name", nullable = false, length = 50)
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "STRUCTURE_ID", nullable = false)
+    @JoinColumn(name = "structure_id", nullable = false)
     private Structure structure;
 
     @Min(0)
-    @Column(name = "CAPACITY", nullable = false)
+    @Column(name = "capacity", nullable = false)
     private Integer capacity;
 }

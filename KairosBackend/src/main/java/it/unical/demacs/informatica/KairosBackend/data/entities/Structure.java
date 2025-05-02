@@ -33,6 +33,9 @@ public class Structure
     })
     private Address address;
 
+    @OneToOne(mappedBy = "structure", cascade = CascadeType.ALL, orphanRemoval = true)
+    private StructureImage structureImage;
+
     @OneToMany(mappedBy = "structure", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sector> sectors;
 }

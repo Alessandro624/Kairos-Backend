@@ -3,6 +3,7 @@ package it.unical.demacs.informatica.KairosBackend.data.repository;
 import it.unical.demacs.informatica.KairosBackend.data.entities.Event;
 import it.unical.demacs.informatica.KairosBackend.data.entities.Structure;
 import it.unical.demacs.informatica.KairosBackend.data.entities.User;
+import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Category;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,7 +14,8 @@ import java.util.UUID;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, UUID>, PagingAndSortingRepository<Event, UUID> {
-    Page<Event> findAllByOrganizer(User user, Pageable pageable);
-    Page<Event> findAllByDateTimeBetween(LocalDateTime from, LocalDateTime to, Pageable pageable);
-    Page<Event> findAllByStructure(Structure structure, Pageable pageable);
+    Page<Event> findAllByOrganizerOrderByDateTimeAsc(User user, Pageable pageable);
+    Page<Event> findAllByDateTimeBetweenOrderByDateTimeAsc(LocalDateTime from, LocalDateTime to, Pageable pageable);
+    Page<Event> findAllByStructureOrderByDateTimeAsc(Structure structure, Pageable pageable);
+    Page<Event> findAllByCategoryOrderByDateTimeAsc(Category category, Pageable pageable);
 }

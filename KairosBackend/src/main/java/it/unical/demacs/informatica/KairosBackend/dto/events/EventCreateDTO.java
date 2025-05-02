@@ -42,9 +42,9 @@ public class EventCreateDTO {
     @NotNull(message = "structureId cannot be null.")
     private UUID structureId;
 
-    // DTO of these two entities is missing...
 
-    private List<EventSector> sectors;
+    // private List<EventSector> sectors;
 
+    // can this be null ?
     private List<EventImageCreateDTO> images;
 }

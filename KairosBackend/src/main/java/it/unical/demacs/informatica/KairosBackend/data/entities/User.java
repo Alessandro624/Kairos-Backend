@@ -1,6 +1,7 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Provider;
+import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,10 +49,9 @@ public class User {
     @Column(name = "email_verified", nullable = false)
     private boolean emailVerified;
 
-    // TODO role mapping -> it can be handled as list of roles ?
-    // @Enumerated(EnumType.STRING)
-    // @Column(name = "role", nullable = false)
-    // private UserRole role;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private UserRole role;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "provider", nullable = false)

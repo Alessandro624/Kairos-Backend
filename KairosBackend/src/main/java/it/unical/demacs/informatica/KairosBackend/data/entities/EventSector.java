@@ -17,17 +17,17 @@ public class EventSector
     @Id
     @GeneratedValue
     @UuidGenerator
-    @Column(name = "ID", nullable = false, unique = true, updatable = false, length = 36)
+    @Column(name = "id", nullable = false, unique = true, updatable = false, length = 36)
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "EVENT_ID")
+    @JoinColumn(name = "event_id")
     private Event event;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "SECTOR_ID")
+    @JoinColumn(name = "sector_id")
     private Sector sector;
 
-    @Column(name = "PRICE", precision = 10, scale = 2)
+    @Column(name = "price", precision = 10, scale = 2)
     private BigDecimal price;
 }

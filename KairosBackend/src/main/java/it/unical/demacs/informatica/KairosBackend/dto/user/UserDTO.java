@@ -1,6 +1,7 @@
 package it.unical.demacs.informatica.KairosBackend.dto.user;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Provider;
+import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -34,8 +35,8 @@ public class UserDTO {
 
     private String phoneNumber;
 
-    // @NotNull(message = "Role cannot be null")
-    // private UserRole role;
+    @NotNull(message = "Role cannot be null")
+    private UserRole role;
 
     @NotNull(message = "Authentication provider cannot be null")
     private Provider provider;

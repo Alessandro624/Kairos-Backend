@@ -17,9 +17,9 @@ public class EntityAuditTrailListener<T>{
     private void beforeAnyUpdate(T entity) {
         UUID entityID = getId(entity);
         if (entityID == null) {
-            log.info("[" + entity.getClass().getName().toUpperCase() +" AUDIT] About to add a student");
+            log.info("[{} AUDIT] About to add a student", entity.getClass().getName().toUpperCase());
         } else {
-            log.info("[" + entity.getClass().getName().toUpperCase() +" AUDIT] About to update/delete student: " + entityID);
+            log.info("[{} AUDIT] About to update/delete student: {}", entity.getClass().getName().toUpperCase(), entityID);
         }
     }
 
@@ -27,12 +27,12 @@ public class EntityAuditTrailListener<T>{
     @PostUpdate
     @PostRemove
     private void afterAnyUpdate(T entity) {
-        log.info("[" + entity.getClass().getName().toUpperCase() +" AUDIT] add/update/delete complete for student: " + getId(entity));
+        log.info("[{} AUDIT] add/update/delete complete for student: {}", entity.getClass().getName().toUpperCase(), getId(entity));
     }
 
     @PostLoad
     private void afterLoad(T entity) {
-        log.info("[" + entity.getClass().getName().toUpperCase() +" AUDIT] user loaded from database: " + getId(entity));
+        log.info("[{} AUDIT] user loaded from database: {}", entity.getClass().getName().toUpperCase(), getId(entity));
     }
 
     private UUID getId(T entity) {

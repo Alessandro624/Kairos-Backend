@@ -15,11 +15,13 @@ public class EntityAuditTrailListener<T>{
     @PreUpdate
     @PreRemove
     private void beforeAnyUpdate(T entity) {
+        String name = entity.getClass().getName();
+
         UUID entityID = getId(entity);
         if (entityID == null) {
-            log.info("[{} AUDIT] About to add a student", entity.getClass().getName().toUpperCase());
+            log.info("[{} AUDIT] About to add a {}",name.toUpperCase(), name.toLowerCase());
         } else {
-            log.info("[{} AUDIT] About to update/delete student: {}", entity.getClass().getName().toUpperCase(), entityID);
+            log.info("[{} AUDIT] About to update/delete {}: {}", name.toUpperCase(), entityID, name.toLowerCase());
         }
     }
 
@@ -27,12 +29,14 @@ public class EntityAuditTrailListener<T>{
     @PostUpdate
     @PostRemove
     private void afterAnyUpdate(T entity) {
-        log.info("[{} AUDIT] add/update/delete complete for student: {}", entity.getClass().getName().toUpperCase(), getId(entity));
+        String name = entity.getClass().getName();
+        log.info("[{} AUDIT] add/update/delete complete for {}: {}", name.toUpperCase(), getId(entity), name.toLowerCase());
     }
 
     @PostLoad
     private void afterLoad(T entity) {
-        log.info("[{} AUDIT] user loaded from database: {}", entity.getClass().getName().toUpperCase(), getId(entity));
+        String name = entity.getClass().getName();
+        log.info("[{} AUDIT] user loaded from database: {}", name.toUpperCase(), getId(entity));
     }
 
     private UUID getId(T entity) {

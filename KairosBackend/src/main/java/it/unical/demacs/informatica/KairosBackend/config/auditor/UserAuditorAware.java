@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public class UserAuditorAware implements AuditorAware<UUID> {
 
-    private static final UUID AUTH_CODE = new UUID(0, 0);
+    private static final UUID AUTH_CODE = UUID.randomUUID();
     @Override
     public Optional<UUID> getCurrentAuditor() {
         //TODO get logged user (Spring security)

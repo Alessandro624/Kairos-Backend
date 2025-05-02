@@ -1,6 +1,7 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.WishlistScope;
+import it.unical.demacs.informatica.KairosBackend.listener.EntityAuditTrailListener;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,12 +15,13 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
 @Table(name="wishlist")
 @Data
-@EntityListeners(value = {AuditingEntityListener.class})
+@EntityListeners(value = {AuditingEntityListener.class, EntityAuditTrailListener.class})
 @NoArgsConstructor
 public class Wishlist {
     @Id
@@ -77,5 +79,33 @@ public class Wishlist {
     @LastModifiedDate
     @Column(name = "last_modified_date", nullable = false)
     private LocalDateTime lastModifiedDate;
+
+    //TODO add equals() and hashcode() methods in Entity and Event class in order to remove these methods.
+    public int containsUser(User user) {
+        for(int i = 0; i< sharedUsers.size(); i++)
+            if(sharedUsers.get(i).getId().equals(user.getId()))
+                return i;
+        return -1;
+    }
+
+    public int containsEvent(Event event) {
+        for(int i = 0; i< wishedEvents.size(); i++)
+            if(wishedEvents.get(i).getId().equals(event.getId()))
+                return i;
+        return -1;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Wishlist wishlist = (Wishlist) o;
+        return Objects.equals(id, wishlist.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }
 

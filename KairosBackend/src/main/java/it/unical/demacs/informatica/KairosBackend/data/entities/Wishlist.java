@@ -1,31 +1,36 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.WishlistScope;
+import it.unical.demacs.informatica.KairosBackend.listener.EntityAuditTrailListener;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
 @Table(name="wishlist")
 @Data
+@EntityListeners(value = {AuditingEntityListener.class, EntityAuditTrailListener.class})
 @NoArgsConstructor
 public class Wishlist {
-    //nota: i controlli (null, min, max...) a quanto pare converrebbe inserirli direttamente nei DTO.
     @Id
     @UuidGenerator
-    @Column(name="id", nullable=false, unique=true, updatable=false,length=36)
+    @Column(name="id", columnDefinition = "uuid", nullable=false, unique=true, updatable=false,length=36)
     private UUID id;
 
     @Column(nullable=false,length=50)
     private String name;
-
-    @Column(name = "creation_date", nullable=false)
-    private LocalDate creationDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
@@ -45,7 +50,6 @@ public class Wishlist {
     )
     private List<Event> wishedEvents;
 
-    //TODO change @OneToMany in @ManyToMany in User entity
     @ManyToMany
     @JoinTable(
             name="wishlist_user",
@@ -53,5 +57,55 @@ public class Wishlist {
             inverseJoinColumns = @JoinColumn(name="user_id", nullable=false)
     )
     private List<User> sharedUsers;
+
+    //FIXME maybe a superclass or an interface containing these methods (as well as annotations)
+    //AUDITING: note that 'creator' is different
+    //one is used for business logic, the other one is used for auditing.
+    //'createdBy' is thought as something used internally
+    @CreatedBy
+    @Column(name = "created_by", columnDefinition="uuid", updatable = false, nullable=false, length = 36)
+    private UUID createdBy;
+
+    //creationDate can be used for both auditing and business logic instead
+    @CreatedDate
+    @Column(name = "creation_date", nullable=false, updatable = false)
+    private LocalDateTime creationDate;
+
+    //still useful (maybe ADMIN can modify the wishlist)
+    @LastModifiedBy
+    @Column(name = "last_modified_by", nullable=false)
+    private UUID lastModifiedBy;
+
+    @LastModifiedDate
+    @Column(name = "last_modified_date", nullable = false)
+    private LocalDateTime lastModifiedDate;
+
+    //TODO add equals() and hashcode() methods in Entity and Event class in order to remove these methods.
+    public int containsUser(User user) {
+        for(int i = 0; i< sharedUsers.size(); i++)
+            if(sharedUsers.get(i).getId().equals(user.getId()))
+                return i;
+        return -1;
+    }
+
+    public int containsEvent(Event event) {
+        for(int i = 0; i< wishedEvents.size(); i++)
+            if(wishedEvents.get(i).getId().equals(event.getId()))
+                return i;
+        return -1;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Wishlist wishlist = (Wishlist) o;
+        return Objects.equals(id, wishlist.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }
 

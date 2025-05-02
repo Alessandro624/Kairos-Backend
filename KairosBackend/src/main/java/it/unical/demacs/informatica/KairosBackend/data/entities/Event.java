@@ -1,5 +1,6 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities;
 
+import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Category;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -23,16 +24,17 @@ public class Event {
     private UUID id;
 
     @Size(min = 1, max = 100)
-    @NonNull
     @Column(name = "title", nullable = false)
     private String title;
 
     @Size(min = 1, max = 1000)
-    @NonNull
     @Column(name = "description", nullable = false)
     private String description;
 
-    @NonNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category", nullable = false)
+    private Category category;
+
     @Column(name = "datetime", nullable = false)
     private LocalDateTime dateTime;
 
@@ -47,6 +49,9 @@ public class Event {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_structure")
     private Structure structure;
+
+    @OneToMany(mappedBy = "eventsector")
+    private List<EventSector> sectors;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EventImage> images;

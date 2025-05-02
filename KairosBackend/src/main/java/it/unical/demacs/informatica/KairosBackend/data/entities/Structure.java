@@ -19,19 +19,22 @@ public class Structure
     @Id
     @GeneratedValue
     @UuidGenerator
-    @Column(name = "ID", nullable = false, unique = true, updatable = false, length = 36)
+    @Column(name = "id", nullable = false, unique = true, updatable = false, length = 36)
     private UUID id;
 
-    @Column(name = "NAME", nullable = false, length = 50)
+    @Column(name = "name", nullable = false, length = 50)
     private String name;
 
     @Embedded
     @AttributeOverrides ({
-            @AttributeOverride(name = "street", column = @Column(name = "ADDRESS_STREET")),
-            @AttributeOverride(name = "city", column = @Column(name = "ADDRESS_CITY")),
-            @AttributeOverride(name = "zipCode", column = @Column(name = "ADDRESS_ZIPCODE"))
+            @AttributeOverride(name = "street", column = @Column(name = "address_street")),
+            @AttributeOverride(name = "city", column = @Column(name = "address_city")),
+            @AttributeOverride(name = "zipCode", column = @Column(name = "address_zipcode"))
     })
     private Address address;
+
+    @OneToOne(mappedBy = "structure", cascade = CascadeType.ALL, orphanRemoval = true)
+    private StructureImage structureImage;
 
     @OneToMany(mappedBy = "structure", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sector> sectors;

@@ -1,6 +1,7 @@
 package it.unical.demacs.informatica.KairosBackend.dto.events;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Category;
+import it.unical.demacs.informatica.KairosBackend.dto.events.eventimage.EventImageCreateDTO;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,7 +35,6 @@ public class EventCreateDTO {
     @Positive(message = "maxParticipants must be positive.")
     @NotNull(message = "maxParticipants cannot be null.")
     private int maxParticipants;
-
     
     @NotNull(message = "organizerId cannot be null.")
     private UUID organizerId;
@@ -43,6 +43,8 @@ public class EventCreateDTO {
     private UUID structureId;
 
     // DTO of these two entities is missing...
-    //private List<EventSector> sectors;
-    //private List<EventImage> images;
+
+    private List<EventSector> sectors;
+
+    private List<EventImageCreateDTO> images;
 }

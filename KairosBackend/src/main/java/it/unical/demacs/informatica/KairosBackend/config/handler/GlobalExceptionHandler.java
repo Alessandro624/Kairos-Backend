@@ -34,8 +34,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NullPointerException.class)
-    @ResponseStatus(HttpStatus.I_AM_A_TEAPOT)
-    public ServiceError onResourceNotFoundException(WebRequest req, NullPointerException ex) {
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ServiceError onNullPointerException(WebRequest req, NullPointerException ex) {
         log.warn("Null pointer exception occurred : {}", ex.getMessage());
         return errorResponse(req, ex.getMessage());
     }

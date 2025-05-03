@@ -112,9 +112,8 @@ public class GlobalExceptionHandler {
     public ServiceError onMethodArgumentNotValid(WebRequest req, MethodArgumentNotValidException ex) {
         String message = ex.getBindingResult().getFieldErrors().stream()
                 .map(viol -> {
-                    assert viol.getDefaultMessage() != null;
-                    return viol.getField().concat(" : ")
-                            .concat(viol.getDefaultMessage());
+                    String defaultMessage = viol.getDefaultMessage() != null ? viol.getDefaultMessage() : "Unknown error";
+                    return viol.getField().concat(" : ").concat(defaultMessage);
                 })
                 .collect(Collectors.joining(" , "));
         log.info("Validation errors: {}", message);

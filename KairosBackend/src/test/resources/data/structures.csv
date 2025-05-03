@@ -1,0 +1,21 @@
+name;street;city;postalCode;country
+Main Campus;123 University Ave;Springfield;12345;USA
+Science Tower;456 Research Blvd;Boston;02115;USA
+Engineering Hall;789 Innovation St;San Francisco;94107;USA
+Medical Center;101 Health Way;Chicago;60601;USA
+Library Building;202 Knowledge Ln;New York;10001;USA
+Student Dorm A;303 Campus Rd;Los Angeles;90007;USA
+Administration;404 College Dr;Austin;73301;USA
+Sports Complex;505 Athletic Ave;Seattle;98101;USA
+Arts Pavilion;606 Creativity St;Denver;80202;USA
+Technology Hub;707 Digital Way;Atlanta;30301;USA
+Business School;808 Commerce St;Dallas;75201;USA
+Law Faculty;909 Justice Ave;Washington;20001;USA
+Chemistry Lab;1010 Experiment Blvd;Philadelphia;19102;USA
+History Department;1111 Past Ln;San Diego;92101;USA
+Mathematics Wing;1212 Equation St;Phoenix;85001;USA
+Language Center;1313 Grammar Rd;Houston;77002;USA
+Computer Science;1414 Binary Ave;Miami;33101;USA
+Psychology Dept;1515 Mind Way;Orlando;32801;USA
+Biology Building;1616 Genome St;San Jose;95101;USA
+Physics Tower;1717 Quantum Dr;Portland;97201;USA

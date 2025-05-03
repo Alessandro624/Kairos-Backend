@@ -2,8 +2,6 @@ package it.unical.demacs.informatica.KairosBackend.data.services;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.Structure;
 import it.unical.demacs.informatica.KairosBackend.data.repository.StructureRepository;
-import it.unical.demacs.informatica.KairosBackend.utility.listener.getStructureByIdEvent;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,12 +12,10 @@ import java.util.UUID;
 public class StructureServiceImpl implements StructureService
 {
     private final StructureRepository structureRepository;
-    private final ApplicationEventPublisher publisher;
 
-    public StructureServiceImpl(StructureRepository structureRepository, ApplicationEventPublisher publisher)
+    public StructureServiceImpl(StructureRepository structureRepository)
     {
         this.structureRepository = structureRepository;
-        this.publisher = publisher;
     }
 
     @Override
@@ -31,7 +27,6 @@ public class StructureServiceImpl implements StructureService
     @Override
     public Optional<Structure> getStructureById(UUID id)
     {
-        publisher.publishEvent(new getStructureByIdEvent(id));
         return structureRepository.findById(id);
     }
 
@@ -45,5 +40,10 @@ public class StructureServiceImpl implements StructureService
     public void deleteStructure(UUID id)
     {
         structureRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<Structure> findByName(String name) {
+        return structureRepository.findByUsername(name);
     }
 }

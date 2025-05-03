@@ -3,6 +3,8 @@ package it.unical.demacs.informatica.KairosBackend.dto.structure;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
+import java.util.UUID;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -11,6 +13,9 @@ import lombok.*;
 @Setter
 public class StructurePreviewDTO
 {
+    @NotNull(message = "Id cannot be null")
+    private UUID id;
+
     @NotBlank(message = "Name cannot be blank")
     @Size(max = 100, message = "Name must be at most 100 characters")
     private String name;

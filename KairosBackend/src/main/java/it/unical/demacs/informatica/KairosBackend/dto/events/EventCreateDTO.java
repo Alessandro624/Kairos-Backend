@@ -42,7 +42,7 @@ public class EventCreateDTO {
     @NotNull(message = "structureId cannot be null.")
     private UUID structureId;
 
-
+    // TODO: EventSectorDTO is missing
     // private List<EventSector> sectors;
 
     // can this be null ?

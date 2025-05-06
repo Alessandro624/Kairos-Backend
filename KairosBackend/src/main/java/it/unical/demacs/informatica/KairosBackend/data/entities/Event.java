@@ -66,7 +66,11 @@ public class Event {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Event event = (Event) o;
-        return maxParticipants == event.maxParticipants && Objects.equals(id, event.id) && Objects.equals(title, event.title) && Objects.equals(description, event.description) && category == event.category && Objects.equals(dateTime, event.dateTime) && Objects.equals(organizer, event.organizer) && Objects.equals(structure, event.structure) && Objects.equals(sectors, event.sectors) && Objects.equals(images, event.images);
+        return maxParticipants == event.maxParticipants && Objects.equals(id, event.id) && Objects.equals(title, event.title)
+                && Objects.equals(description, event.description) && category == event.category
+                && Objects.equals(dateTime, event.dateTime) && Objects.equals(organizer, event.organizer)
+                && Objects.equals(structure, event.structure) && Objects.equals(sectors, event.sectors)
+                && Objects.equals(images, event.images);
     }
 
     @Override

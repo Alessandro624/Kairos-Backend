@@ -21,6 +21,6 @@ public class EventImageCreateDTO {
 
     @NotBlank(message = "photoUrl cannot be blank.")
     @Pattern(regexp = "[(http(s)?):\\/\\/(www\\.)?a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)",
-            message = "phtoUrl must be a valid link.")
+            message = "photoUrl must be a valid link.")
     private String photoUrl;
 }

@@ -1,6 +1,7 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.embeddables.Address;
+import it.unical.demacs.informatica.KairosBackend.listener.StructureAuditTrailListener;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @ToString
 @Entity
+@EntityListeners(StructureAuditTrailListener.class)
 public class Structure
 {
     @Id

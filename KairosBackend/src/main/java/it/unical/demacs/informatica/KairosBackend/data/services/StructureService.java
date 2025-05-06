@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface StructureService
 {
-    @Cacheable("allStructure")
+    @Cacheable("allStructures")
     List<Structure> getAllStructures();
 
     Optional<Structure> getStructureById(UUID id);
@@ -17,4 +17,6 @@ public interface StructureService
     Structure saveStructure(Structure structure);
 
     void deleteStructure(UUID id);
+
+    Optional<Structure> findByName(String name);
 }

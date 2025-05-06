@@ -21,7 +21,8 @@ import java.util.UUID;
 @Entity
 @Table(name = "event")
 @EntityListeners(value = {AuditingEntityListener.class, EntityAuditTrailListener.class})
-public class Event {
+@EqualsAndHashCode(of = {"id"}, callSuper = false) // TODO: check if it needs more parameters other than id...
+public class Event extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @UuidGenerator(style = UuidGenerator.Style.AUTO)
@@ -60,21 +61,4 @@ public class Event {
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EventImage> images;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Event event = (Event) o;
-        return maxParticipants == event.maxParticipants && Objects.equals(id, event.id) && Objects.equals(title, event.title)
-                && Objects.equals(description, event.description) && category == event.category
-                && Objects.equals(dateTime, event.dateTime) && Objects.equals(organizer, event.organizer)
-                && Objects.equals(structure, event.structure) && Objects.equals(sectors, event.sectors)
-                && Objects.equals(images, event.images);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, title, description, category, dateTime, maxParticipants, organizer, structure, sectors, images);
-    }
 }

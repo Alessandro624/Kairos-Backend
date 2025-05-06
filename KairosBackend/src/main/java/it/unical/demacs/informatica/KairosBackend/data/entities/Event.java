@@ -1,12 +1,16 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Category;
+import it.unical.demacs.informatica.KairosBackend.listener.EntityAuditTrailListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 
@@ -16,6 +20,7 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "event")
+@EntityListeners(value = {AuditingEntityListener.class, EntityAuditTrailListener.class})
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -55,4 +60,17 @@ public class Event {
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EventImage> images;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Event event = (Event) o;
+        return maxParticipants == event.maxParticipants && Objects.equals(id, event.id) && Objects.equals(title, event.title) && Objects.equals(description, event.description) && category == event.category && Objects.equals(dateTime, event.dateTime) && Objects.equals(organizer, event.organizer) && Objects.equals(structure, event.structure) && Objects.equals(sectors, event.sectors) && Objects.equals(images, event.images);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, description, category, dateTime, maxParticipants, organizer, structure, sectors, images);
+    }
 }

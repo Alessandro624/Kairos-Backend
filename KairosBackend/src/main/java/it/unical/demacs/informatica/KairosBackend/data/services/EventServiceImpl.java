@@ -4,6 +4,7 @@ import it.unical.demacs.informatica.KairosBackend.data.entities.Event;
 import it.unical.demacs.informatica.KairosBackend.data.repository.EventRepository;
 import it.unical.demacs.informatica.KairosBackend.dto.events.EventCreateDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.events.EventDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.events.EventUpdateDTO;
 import it.unical.demacs.informatica.KairosBackend.exception.ResourceAlreadyExistsException;
 import it.unical.demacs.informatica.KairosBackend.exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
@@ -24,11 +25,14 @@ public class EventServiceImpl implements EventService{
     private final ModelMapper modelMapper;
 
     @Override
-    public Optional<Event> getEventById(UUID id) {
-        return eventRepository.findById(id);
+    public EventDTO getEventById(UUID id) {
+        Event e = eventRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("Event with id %s not found", id)));
+        return modelMapper.map(e, EventDTO.class);
     }
 
+
     @Override
+    @Transactional
     public void saveEvent(EventCreateDTO event) {
         if (existsEvent(event)) {
             throw new ResourceAlreadyExistsException(String.format("Event with title %s, hosted at %s %s by %s already exists", event.getTitle(),
@@ -41,27 +45,28 @@ public class EventServiceImpl implements EventService{
 
     @Override
     @Transactional
-    public boolean deleteEvent(UUID id) {
-        Optional<Event> event = eventRepository.findById(id);
-        if (event.isEmpty()) {
-            throw new ResourceNotFoundException(String.format("Event with id %s not found", id));
+    public void deleteEvent(UUID id) {
+       Event event = eventRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("Event with id %s not found", id)));
+        for (int i = 0; i < event.getImages().size(); i++) {
+            // TODO: calls CDN service in order to delete images.
+            log.info("Deleted image {}", event.getImages().get(i).getId());
         }
-        for (int i = 0; i < event.get().getImages().size(); i++) {
-            // calls CDN service in order to delete images.
-            log.info("Deleted image {}", event.get().getImages().get(i).getId());
-        }
-        eventRepository.delete(event.get());
+        eventRepository.delete(event);
         log.info("Event {} deleted", id);
-        return true;
     }
 
     @Override
-    public EventDTO updateEvent () {
-        return new EventDTO();
+    @Transactional
+    public EventDTO updateEvent(UUID id, EventUpdateDTO eventUpdated) {
+        Event event = eventRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("Event with id %s not found", id)));
+
+        modelMapper.map(eventUpdated, event);
+        Event changedEvent = eventRepository.save(event);
+        return modelMapper.map(changedEvent, EventDTO.class);
     }
 
-    @Override
-    public boolean existsEvent(EventCreateDTO event) {
+
+    private boolean existsEvent(EventCreateDTO event) {
         return eventRepository.existsEvent(
                 event.getTitle(),
                 event.getDateTime(),

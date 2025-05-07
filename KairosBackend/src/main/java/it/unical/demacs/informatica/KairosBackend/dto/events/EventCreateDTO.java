@@ -29,6 +29,7 @@ public class EventCreateDTO {
     @NotNull(message = "category cannot be null.")
     private Category category;
 
+    @NotNull(message = "dateTime cannot be null.")
     @Future(message = "dateTime must be in the future.")
     private LocalDateTime dateTime;
 

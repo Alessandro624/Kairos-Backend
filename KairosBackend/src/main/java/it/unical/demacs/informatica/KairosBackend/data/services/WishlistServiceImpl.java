@@ -97,7 +97,7 @@ public class WishlistServiceImpl implements WishlistService {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User " + userId + " doesn't exist"));
 
-        if(wishlist.containsUser(user) != -1) throw new ResourceAlreadyExistsException("Wishlist "+ wishlistId+" is already shared to User" + userId);
+        if(wishlist.getSharedUsers().contains(user)) throw new ResourceAlreadyExistsException("Wishlist "+ wishlistId+" is already shared to User" + userId);
 
         wishlist.getSharedUsers().add(user);
 
@@ -112,10 +112,9 @@ public class WishlistServiceImpl implements WishlistService {
         Wishlist wishlist = wishlistRepository.findById(wishlistId).orElseThrow(() -> new ResourceNotFoundException("Wishlist " + wishlistId + " doesn't exist"));
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User " + userId + " doesn't exist"));
 
-        int pos = wishlist.containsUser(user);
-        if(pos == -1) throw new ResourceNotFoundException("No User " + userId + "found in Wishlist" + wishlistId);
+        if(wishlist.getSharedUsers().contains(user)) throw new ResourceNotFoundException("No User " + userId + "found in Wishlist" + wishlistId);
+        wishlist.getSharedUsers().remove(user);
 
-        wishlist.getSharedUsers().remove(pos);
         //TODO add email, or some notification system to notify removed user.
         wishlistRepository.save(wishlist);
     }

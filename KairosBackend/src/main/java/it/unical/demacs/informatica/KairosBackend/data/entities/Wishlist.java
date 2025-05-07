@@ -57,14 +57,7 @@ public class Wishlist extends AuditableEntity {
     )
     private List<User> sharedUsers;
 
-    //TODO add equals() and hashcode() methods in Entity and Event class in order to remove these methods.
-    public int containsUser(User user) {
-        for(int i = 0; i< sharedUsers.size(); i++)
-            if(sharedUsers.get(i).getId().equals(user.getId()))
-                return i;
-        return -1;
-    }
-
+    //TODO add equals() and hashcode() methods in Event class in order to remove these methods.
     public int containsEvent(Event event) {
         for(int i = 0; i< wishedEvents.size(); i++)
             if(wishedEvents.get(i).getId().equals(event.getId()))

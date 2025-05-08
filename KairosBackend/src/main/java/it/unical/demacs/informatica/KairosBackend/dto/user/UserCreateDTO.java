@@ -1,5 +1,7 @@
 package it.unical.demacs.informatica.KairosBackend.dto.user;
 
+import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Provider;
+import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.UserRole;
 import it.unical.demacs.informatica.KairosBackend.dto.annotations.Password;
 import it.unical.demacs.informatica.KairosBackend.dto.annotations.PhoneNumber;
 import it.unical.demacs.informatica.KairosBackend.dto.annotations.Username;
@@ -35,6 +37,10 @@ public class UserCreateDTO {
     @NotBlank(message = "Password cannot be blank")
     @Password(max = 15, allowedSymbols = "@#$%^&+=!*()-_")
     private String password;
+
+    private UserRole role;
+
+    private Provider provider;
 
     @PhoneNumber
     private String phoneNumber;

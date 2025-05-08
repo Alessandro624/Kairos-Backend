@@ -1,11 +1,13 @@
 package it.unical.demacs.informatica.KairosBackend.config.handler;
 
 import io.swagger.v3.oas.annotations.Hidden;
+import it.unical.demacs.informatica.KairosBackend.config.i18n.MessageReader;
 import it.unical.demacs.informatica.KairosBackend.dto.ServiceError;
 import it.unical.demacs.informatica.KairosBackend.exception.ResourceAlreadyExistsException;
 import it.unical.demacs.informatica.KairosBackend.exception.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.UnexpectedTypeException;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
@@ -23,34 +25,38 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @Slf4j
+@AllArgsConstructor
 public class GlobalExceptionHandler {
+    private final MessageReader messageReader;
+
     // TODO add missing exceptions and create new custom ones for them.
 
+    //FIXME internationalization is not necessary for all the exceptions...
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ServiceError defaultErrorHandler(WebRequest req, Exception ex) {
-        log.warn("Unhandled exception occurred : {}", ex.getMessage());
+        log.warn(messageReader.getMessage("exceptions.default", ex.getMessage()));
         return errorResponse(req, ex.getMessage());
     }
 
     @ExceptionHandler(NullPointerException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ServiceError onNullPointerException(WebRequest req, NullPointerException ex) {
-        log.warn("Null pointer exception occurred : {}", ex.getMessage());
+        log.warn(messageReader.getMessage("exceptions.null_pointer", ex.getMessage()));
         return errorResponse(req, ex.getMessage());
     }
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ServiceError onBadRequestException(WebRequest req, BadRequestException ex) {
-        log.info(ex.getMessage());
+        log.info(messageReader.getMessage("exceptions.bad_request", ex.getMessage()));
         return errorResponse(req, ex.getMessage());
     }
 
     @ExceptionHandler(UnexpectedTypeException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ServiceError onUnexpectedTypeException(WebRequest req, UnexpectedTypeException ex) {
-        log.info(ex.getMessage());
+        log.info(messageReader.getMessage("exceptions.unexpected_type", ex.getMessage()));
         return errorResponse(req, ex.getMessage());
     }
 
@@ -58,28 +64,28 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
     @Hidden
     public ServiceError onHttpMediaTypeException(WebRequest req, HttpMediaTypeException ex) {
-        log.info(ex.getMessage());
+        log.info(messageReader.getMessage("exceptions.unsupported_media_type", ex.getMessage()));
         return errorResponse(req, ex.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ServiceError onIllegalArgumentException(WebRequest req, IllegalArgumentException ex) {
-        log.info(ex.getMessage());
+        log.info(messageReader.getMessage("exceptions.illegal_argument", ex.getMessage()));
         return errorResponse(req, ex.getMessage());
     }
 
     @ExceptionHandler(IllegalStateException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ServiceError onIllegalStateException(WebRequest req, IllegalStateException ex) {
-        log.info(ex.getMessage());
+        log.info(messageReader.getMessage("exceptions.illegal_state", ex.getMessage()));
         return errorResponse(req, ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ServiceError onMethodArgumentTypeMismatchException(WebRequest req, MethodArgumentTypeMismatchException ex) {
-        log.info(ex.getMessage());
+        log.info(messageReader.getMessage("exceptions.method_argument_type_mismatch", ex.getMessage()));
         return errorResponse(req, ex.getMessage());
     }
 
@@ -87,7 +93,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @Hidden
     public ServiceError onNoResourceFoundException(WebRequest req, NoResourceFoundException ex) {
-        log.info(ex.getMessage());
+        log.info(messageReader.getMessage("exceptions.no_resource_found", ex.getMessage()));
         return errorResponse(req, ex.getMessage());
     }
 
@@ -95,7 +101,7 @@ public class GlobalExceptionHandler {
     @Hidden
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ServiceError onResourceNotFoundException(WebRequest req, ResourceNotFoundException ex) {
-        log.info(ex.getMessage());
+        log.info(messageReader.getMessage("exceptions.resource_not_found", ex.getMessage()));
         return errorResponse(req, ex.getMessage());
     }
 
@@ -103,7 +109,7 @@ public class GlobalExceptionHandler {
     @Hidden
     @ResponseStatus(HttpStatus.CONFLICT)
     public ServiceError onResourceAlreadyExistsException(WebRequest req, ResourceAlreadyExistsException ex) {
-        log.info(ex.getMessage());
+        log.info(messageReader.getMessage("exceptions.resource_already_exists", ex.getMessage()));
         return errorResponse(req, ex.getMessage());
     }
 
@@ -116,7 +122,7 @@ public class GlobalExceptionHandler {
                     return viol.getField().concat(" : ").concat(defaultMessage);
                 })
                 .collect(Collectors.joining(" , "));
-        log.info("Validation errors: {}", message);
+        log.info(messageReader.getMessage("exceptions.method_argument_not_valid", message));
         return errorResponse(req, message);
     }
 
@@ -125,7 +131,7 @@ public class GlobalExceptionHandler {
         assert httpReq != null;
         String uri = httpReq.getRequestURI();
         final ServiceError output = new ServiceError(new Date(), uri, message);
-        log.error("Exception handler :::: {}", output);
+        log.error(messageReader.getMessage("exceptions.handler", output));
         return output;
     }
 }

@@ -4,7 +4,7 @@ import it.unical.demacs.informatica.KairosBackend.data.entities.User;
 import it.unical.demacs.informatica.KairosBackend.data.repository.UserRepository;
 import it.unical.demacs.informatica.KairosBackend.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .authorities((GrantedAuthority) List.of("ROLE_" + user.getRole()))
+                .authorities(List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole())))
                 .accountLocked(false)
                 .disabled(!user.isEmailVerified())
                 .build();

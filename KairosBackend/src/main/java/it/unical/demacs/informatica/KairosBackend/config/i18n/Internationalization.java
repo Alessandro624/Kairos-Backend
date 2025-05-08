@@ -12,12 +12,28 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 /*
-   NOTE: how do we access bundle files properly?
-   LocaleResolver.resolveLocale(HttpServletRequest) (implemented in AcceptHeaderLocaleResolver class)
-   is a method that, given an HTTP request (and its Accept-Language header if AcceptHeaderLocaleResolver is used),
-   makes us return the specific Locale, that can give us access to the proper
-   messages.properties resource bundle file.
-*/
+ * HOW IT WORKS:
+ * Given an HTTP request, Spring DispatcherServlet calls this LocaleResolver object in order to
+ * obtain the proper Locale object using resolveLocale(HTTPServletRequest) method, that returns the Locale used for the current request.
+ * The LocaleResolver object is injected in another object, called LocaleContext, that is saved in
+ * a ThreadLocal using static method LocaleContextHolder.setLocale(...)
+ *
+ * From this point, if you call LocaleContextHolder.getLocale() wherever your code is, you get the correct Locale object!
+ *
+ * QUESTION: WHY NOT USING The LocaleResolver directly?
+ *
+ * ACCESS THE PROPER .properties file saved in resource bundle
+ * Done automatically by Spring Boot, given a file messages_X.properties, where X is it,en,...
+ *
+ * ACCESS THE (CORRECT!) MESSAGE
+ * Inject a MessageSource object (see WishlistController, for example), and in particular a ResourceBundleMessageSource object.
+ * Specify the resource bundle location and other stuff
+ * With the messageSource.getMessage(String propertyName, Object... args, Locale locale), you can get the proper message!
+ * ... And what to specify as Locale?
+ * LocaleContextHolder.getLocale()!!!! (see above.)
+ *
+ * (see MessageReader class: why we used it?)
+ * */
 
 @Configuration
 public class Internationalization {
@@ -30,10 +46,9 @@ public class Internationalization {
     @Value("${app.locales.default}")
     private String defaultLocale;
 
-    //creates a bean containing our personal locale resolver.
     @Bean
     public AcceptHeaderLocaleResolver localeResolver() {
-        //language is determined by HTTP request "accept-language" header (AcceptHeaderLocaleResolver)
+        //Locale is determined by HTTP request "accept-language" header (AcceptHeaderLocaleResolver) using resolveLocale method (see above)
         AcceptHeaderLocaleResolver resolver = new AcceptHeaderLocaleResolver();
 
         //setSupportedLocales requires a List<Locale>. Using streams we can obtain it.
@@ -42,5 +57,15 @@ public class Internationalization {
         resolver.setDefaultLocale(Locale.forLanguageTag(this.defaultLocale));
 
         return resolver;
+    }
+
+    @Bean
+    public ResourceBundleMessageSource messageSource() {
+        ResourceBundleMessageSource source = new ResourceBundleMessageSource();
+        //here we specify all the messages bundles location of our .property files (starting from resources folder!)
+        source.setBasenames("language/messages");
+        source.setDefaultEncoding("UTF-8");
+
+        return source;
     }
 }

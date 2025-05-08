@@ -20,7 +20,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "event")
 @EntityListeners(value = {AuditingEntityListener.class, EntityAuditTrailListener.class})
-@EqualsAndHashCode(of = {"id"}, callSuper = false) // TODO: check if it needs more parameters other than id...
+@EqualsAndHashCode(of = {"id"}, callSuper = false)
 public class Event extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -46,6 +46,9 @@ public class Event extends AuditableEntity {
     @Size(min=1)
     @Column(name = "maxparticipants", nullable = false)
     private int maxParticipants;
+
+    @Column(name = "visible", nullable = false)
+    private boolean isVisible;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_organizer")

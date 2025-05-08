@@ -20,14 +20,19 @@ public interface EventRepository extends JpaRepository<Event, UUID>, PagingAndSo
             "FROM Event e " +
             "WHERE lower(e.title) = lower(:title) AND e.dateTime = :data " +
             "AND e.structure.id = :structure AND e.organizer.id = :organizer")
-    boolean existsEvent (@Param("title") String title, @Param("data") LocalDateTime data,
-                         @Param("structure") UUID structureId, @Param("organizer") UUID organizerId);
+    boolean existsEvent(@Param("title") String title, @Param("data") LocalDateTime data,
+                        @Param("structure") UUID structureId, @Param("organizer") UUID organizerId);
 
-    // trovare gli eventi nei prossimi giorni, dal giorno corrente mandato dal frontend (?) e vicino da me
-//    @Query("")
-//    Page<Event> findEventsNearMe(Pageable pageable);
-    Page<Event> findAllByOrganizerOrderByDateTimeAsc(User user, Pageable pageable);
-    Page<Event> findAllByDateTimeBetweenOrderByDateTimeAsc(LocalDateTime from, LocalDateTime to, Pageable pageable);
-    Page<Event> findAllByStructureOrderByDateTimeAsc(Structure structure, Pageable pageable);
-    Page<Event> findAllByCategoryOrderByDateTimeAsc(Category category, Pageable pageable);
+
+    @Query("SELECT e FROM Event e " +
+            "WHERE e.structure.address.city = :city OR e.structure.address.zipCode = :zip " +
+            "AND e.isVisible = True AND e.dateTime >= :fromDate " +
+            "ORDER BY e.dateTime ASC")
+    Page<Event> findEventsNearLocationStartingFrom(@Param("city") String city, @Param("zip") String zip,
+                                                   @Param("fromDate") LocalDateTime now, Pageable pageable);
+
+    Page<Event> findAllByOrganizerAndVisibleTrueOrderByDateTimeAsc(User user, Pageable pageable);
+    Page<Event> findAllByDateTimeBetweenAndVisibleTrueOrderByDateTimeAsc(LocalDateTime from, LocalDateTime to, Pageable pageable);
+    Page<Event> findAllByStructureAndVisibleTrueOrderByDateTimeAsc(Structure structure, Pageable pageable);
+    Page<Event> findAllByCategoryAndVisibleTrueOrderByDateTimeAsc(Category category, Pageable pageable);
 }

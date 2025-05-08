@@ -29,9 +29,9 @@ public class Structure
 
     @Embedded
     @AttributeOverrides ({
-            @AttributeOverride(name = "street", column = @Column(name = "address_street")),
-            @AttributeOverride(name = "city", column = @Column(name = "address_city")),
-            @AttributeOverride(name = "zipCode", column = @Column(name = "address_zipcode"))
+            @AttributeOverride(name = "street", column = @Column(name = "address_street", nullable = false)),
+            @AttributeOverride(name = "city", column = @Column(name = "address_city", nullable = false)),
+            @AttributeOverride(name = "zipCode", column = @Column(name = "address_zipcode", nullable = false))
     })
     private Address address;
 

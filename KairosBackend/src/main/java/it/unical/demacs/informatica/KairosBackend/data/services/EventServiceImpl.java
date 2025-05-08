@@ -104,8 +104,8 @@ public class EventServiceImpl implements EventService{
         return null;
     }
 
-    public Page<EventDTO> getAllEventsByCategory(Category category, Pageable pageable) {
-        Page<Event> events = eventRepository.findAllByCategoryAndVisibleTrueOrderByDateTimeAsc(category, pageable);
+    public Page<EventDTO> getAllEventsByCategory(Category cat, Pageable pageable) {
+        Page<Event> events = eventRepository.findAllByCategoryAndVisibleTrueOrderByDateTimeAsc(cat, pageable);
         return events.map(e -> modelMapper.map(e, EventDTO.class));
     }
 

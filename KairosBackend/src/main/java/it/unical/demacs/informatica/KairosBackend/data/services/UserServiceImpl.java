@@ -1,7 +1,6 @@
 package it.unical.demacs.informatica.KairosBackend.data.services;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.User;
-import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Provider;
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.UserRole;
 import it.unical.demacs.informatica.KairosBackend.data.repository.UserRepository;
 import it.unical.demacs.informatica.KairosBackend.dto.user.UserCreateDTO;
@@ -9,7 +8,6 @@ import it.unical.demacs.informatica.KairosBackend.dto.user.UserDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.user.UserUpdateDTO;
 import it.unical.demacs.informatica.KairosBackend.exception.ResourceAlreadyExistsException;
 import it.unical.demacs.informatica.KairosBackend.exception.ResourceNotFoundException;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -52,8 +50,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<UserDTO> findByUsernameOrEmail(String usernameOrEmail) {
+        Optional<User> user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
+        return user.map(u -> modelMapper.map(u, UserDTO.class));
+    }
+
+    @Override
     @Transactional
-    public UserDTO updateUser(UUID userId, @Valid UserUpdateDTO userDTO) {
+    public UserDTO updateUser(UUID userId, UserUpdateDTO userDTO) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
@@ -65,7 +70,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO createUser(@Valid UserCreateDTO userDTO) {
+    public UserDTO createUser(UserCreateDTO userDTO) {
         if (userRepository.existsByUsername(userDTO.getUsername())) {
             throw new ResourceAlreadyExistsException("Username " + userDTO.getUsername() + " already exists");
         }
@@ -75,9 +80,6 @@ public class UserServiceImpl implements UserService {
         User newUser = modelMapper.map(userDTO, User.class);
         newUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         newUser.setEmailVerified(false);
-        newUser.setProvider(Provider.LOCAL);
-        // TODO handle Role
-        newUser.setRole(UserRole.USER);
         User savedUser = userRepository.save(newUser);
         // TODO send verification email or handle it with another service
         // TODO handle other object creations

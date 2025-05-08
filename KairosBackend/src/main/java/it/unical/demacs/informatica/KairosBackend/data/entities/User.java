@@ -9,9 +9,6 @@ import org.hibernate.annotations.UuidGenerator;
 import java.util.List;
 import java.util.UUID;
 
-// TODO add interface UserDetails for Spring Security
-// TODO think of using Set instead of List
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -72,5 +69,5 @@ public class User {
     // @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL, orphanRemoval = true)
     // private List<Event> events;
 
-    // TODO implement UserDetails methods
+    // TODO think of using Set instead of List
 }

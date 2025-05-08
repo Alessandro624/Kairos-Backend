@@ -55,6 +55,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(a -> a
                         .requestMatchers(HttpMethod.POST, "/v1/auth/login", "/v1/auth/refresh").permitAll()
                         .requestMatchers(HttpMethod.GET, "/swagger.html", "/swagger-ui/**", "/api-docs.html", "/actuator").permitAll()
+                        .anyRequest().authenticated()
                 )
                 // JWT FILTER BEFORE LOGIN TODO create a custom filter to allow multiple login providers
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

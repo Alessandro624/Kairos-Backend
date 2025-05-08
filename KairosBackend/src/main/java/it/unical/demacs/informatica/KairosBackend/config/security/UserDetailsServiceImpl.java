@@ -17,13 +17,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) {
+    public UserDetails loadUserByUsername(String usernameOrEmail) {
         // TODO better role handling, maybe with a set of roles
-        User user = userRepository.findByEmail(username)
+        User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getEmail())
+                .username(user.getUsername())
                 .password(user.getPassword())
                 .authorities((GrantedAuthority) List.of("ROLE_" + user.getRole()))
                 .accountLocked(false)

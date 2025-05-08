@@ -24,7 +24,8 @@ services:
     depends_on:
       - db
     ports:
-      - "8080:8080"
+      - "8080:8080"  # HTTP
+      - "8443:8443"  # HTTPS
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/kairos_db
       SPRING_DATASOURCE_USERNAME: postgres

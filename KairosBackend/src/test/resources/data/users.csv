@@ -2,5 +2,5 @@ username;email;firstName;lastName;password;phoneNumber;role;provider;emailVerifi
 testuser;test@example.com;Test;User;password123;+123456789;USER;LOCAL;true
 admin;admin@example.com;Admin;User;adminpass;+987654321;ADMIN;LOCAL;true
 organizer;organizer@example.com;Org;Anizer;orgpass;+111222333;ORGANIZER;LOCAL;true
-participant;participant@example.com;Part;Icipant;partpass;+444555666;PARTICIPANT;LOCAL;false
+participant;participant@example.com;Part;Icipant;partpass;+444555666;USER;LOCAL;false
 google_user;google@example.com;Google;User;;+777888999;USER;GOOGLE;true

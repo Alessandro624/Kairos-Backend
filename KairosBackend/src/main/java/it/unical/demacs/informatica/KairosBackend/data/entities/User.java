@@ -2,15 +2,14 @@ package it.unical.demacs.informatica.KairosBackend.data.entities;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Provider;
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.UserRole;
+import it.unical.demacs.informatica.KairosBackend.listener.EntityAuditTrailListener;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.List;
 import java.util.UUID;
-
-// TODO add interface UserDetails for Spring Security
-// TODO think of using Set instead of List
 
 @Data
 @AllArgsConstructor
@@ -18,8 +17,9 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "users")
-@EqualsAndHashCode(of = {"id"})
-public class User {
+@EntityListeners(value = {AuditingEntityListener.class, EntityAuditTrailListener.class})
+@EqualsAndHashCode(of = {"id"}, callSuper = false)
+public class User extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @UuidGenerator(style = UuidGenerator.Style.AUTO)
@@ -59,7 +59,7 @@ public class User {
     private UserImage profileImage;
 
     @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Wishlist> wishlists;
+    private List<Wishlist> createdWishlists;
 
     @ManyToMany(mappedBy = "sharedUsers")
     private List<Wishlist> sharedWishlists;
@@ -72,5 +72,5 @@ public class User {
     // @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL, orphanRemoval = true)
     // private List<Event> events;
 
-    // TODO implement UserDetails methods
+    // TODO think of using Set instead of List
 }

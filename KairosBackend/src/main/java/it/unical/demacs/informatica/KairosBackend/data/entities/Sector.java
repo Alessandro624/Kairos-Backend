@@ -1,9 +1,11 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Positive;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -24,11 +26,8 @@ public class Sector
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "structure_id", nullable = false)
-    private Structure structure;
+    // Rimosso il campo capacity e la relazione diretta con Structure
 
-    @Positive(message = "Capacity must be positive.")
-    @Column(name = "capacity", nullable = false)
-    private Integer capacity;
+    @OneToMany(mappedBy = "sector", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StructureSector> structureSectors = new ArrayList<>();
 }

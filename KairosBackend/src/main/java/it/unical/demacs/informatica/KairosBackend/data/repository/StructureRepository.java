@@ -15,7 +15,11 @@ import java.util.UUID;
 @Repository
 public interface StructureRepository extends ListCrudRepository<Structure, UUID>, PagingAndSortingRepository<Structure, UUID>
 {
-    @Query("SELECT s.sectors FROM Structure s WHERE s.id = :structureId")
+    @Query("SELECT ss.sector FROM StructureSector ss WHERE ss.structure.id = :structureId")
     List<SectorDTO> findSectorsByStructureId(@Param("structureId") UUID structureId);
+
+    @Query("SELECT ss.capacity FROM StructureSector ss WHERE ss.structure.id = :structureId AND ss.sector.id = :sectorId")
+    Integer findCapacityByStructureAndSector(@Param("structureId") UUID structureId, @Param("sectorId") UUID sectorId);
+
     StructureDTO findByName(String name);
 }

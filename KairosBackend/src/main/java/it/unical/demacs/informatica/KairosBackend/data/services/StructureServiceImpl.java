@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -58,6 +59,7 @@ public class StructureServiceImpl implements StructureService
     }
 
     @Override
+    @Transactional(readOnly = true)
     public StructureDTO create(StructureCreateDTO dto)
     {
         Structure structure = modelMapper.map(dto, Structure.class);
@@ -67,6 +69,7 @@ public class StructureServiceImpl implements StructureService
     }
 
     @Override
+    @Transactional(readOnly = true)
     public void deleteById(UUID id)
     {
         if (!structureRepository.existsById(id))

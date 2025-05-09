@@ -16,7 +16,7 @@ public interface UserService {
 
     Optional<UserDTO> findByEmail(String email);
 
-    // TODO maybe a findByUsernameOrEmail for login ?
+    Optional<UserDTO> findByUsernameOrEmail(String usernameOrEmail);
 
     UserDTO updateUser(UUID userId, UserUpdateDTO userDTO);
 

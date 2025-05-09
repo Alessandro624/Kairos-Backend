@@ -1,5 +1,7 @@
 package it.unical.demacs.informatica.KairosBackend;
 
+import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Provider;
+import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.UserRole;
 import it.unical.demacs.informatica.KairosBackend.data.services.UserService;
 import it.unical.demacs.informatica.KairosBackend.dto.user.UserCreateDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.user.UserDTO;
@@ -59,7 +61,9 @@ public class UserServiceTest {
                         record.get("firstName"),
                         record.get("lastName"),
                         record.get("password"),
-                        record.get("phoneNumber")
+                        record.get("phoneNumber"),
+                        UserRole.valueOf(record.get("role")),
+                        Provider.valueOf(record.get("provider"))
                 );
 
                 if (testUserId == null && record.get("role").equals("USER")) {
@@ -83,7 +87,9 @@ public class UserServiceTest {
             String firstName,
             String lastName,
             String password,
-            String phoneNumber
+            String phoneNumber,
+            UserRole role,
+            Provider provider
     ) {
         UserCreateDTO userCreateDTO = new UserCreateDTO();
         userCreateDTO.setUsername(username);
@@ -92,6 +98,8 @@ public class UserServiceTest {
         userCreateDTO.setLastName(lastName);
         userCreateDTO.setPassword(password);
         userCreateDTO.setPhoneNumber(phoneNumber);
+        userCreateDTO.setRole(role);
+        userCreateDTO.setProvider(provider);
 
         userService.createUser(userCreateDTO);
         return userCreateDTO;
@@ -128,6 +136,19 @@ public class UserServiceTest {
     }
 
     @Test
+    public void testFindByUsernameOrEmail() {
+        String username = "testuser";
+        String email = "test@example.com";
+
+        Optional<UserDTO> user1 = userService.findByUsernameOrEmail(username);
+        Optional<UserDTO> user2 = userService.findByUsernameOrEmail(email);
+
+        assertTrue(user1.isPresent() && user2.isPresent(), "User should be found by username or email");
+        assertEquals(username, user1.get().getUsername(), "Username should match");
+        assertEquals(email, user2.get().getEmail(), "Email should match");
+    }
+
+    @Test
     public void testCreateUser() {
         UserCreateDTO newUser = new UserCreateDTO();
         newUser.setUsername("newuser");
@@ -136,6 +157,8 @@ public class UserServiceTest {
         newUser.setLastName("User");
         newUser.setPassword("password123");
         newUser.setPhoneNumber("+123456789");
+        newUser.setRole(UserRole.USER);
+        newUser.setProvider(Provider.LOCAL);
 
         UserDTO createdUser = userService.createUser(newUser);
 
@@ -145,6 +168,8 @@ public class UserServiceTest {
         assertEquals(newUser.getFirstName(), createdUser.getFirstName(), "First name should match");
         assertEquals(newUser.getLastName(), createdUser.getLastName(), "Last name should match");
         assertEquals(newUser.getPhoneNumber(), createdUser.getPhoneNumber(), "Phone number should match");
+        assertEquals(newUser.getRole(), createdUser.getRole(), "Role should match");
+        assertEquals(newUser.getProvider(), createdUser.getProvider(), "Provider should match");
     }
 
     @Test
@@ -155,6 +180,8 @@ public class UserServiceTest {
         newUser.setFirstName("Unique");
         newUser.setLastName("User");
         newUser.setPassword("password123");
+        newUser.setRole(UserRole.USER);
+        newUser.setProvider(Provider.LOCAL);
 
         assertThrows(Exception.class, () -> userService.createUser(newUser), "Creating user with duplicate username should fail");
     }
@@ -167,6 +194,8 @@ public class UserServiceTest {
         newUser.setFirstName("Unique");
         newUser.setLastName("User");
         newUser.setPassword("password123");
+        newUser.setRole(UserRole.USER);
+        newUser.setProvider(Provider.LOCAL);
 
         assertThrows(Exception.class, () -> userService.createUser(newUser), "Creating user with duplicate email should fail");
     }
@@ -199,7 +228,6 @@ public class UserServiceTest {
 
     @Test
     public void testFindAllUsersAdmin() {
-        /* TODO Test after better handling of ROLE
         Pageable pageable = PageRequest.of(0, 10);
         Page<UserDTO> users = userService.findAllUsersAdmin(pageable);
 
@@ -208,7 +236,6 @@ public class UserServiceTest {
 
         boolean foundAdmin = users.getContent().stream().allMatch(user -> user.getRole() == UserRole.ADMIN);
         assertTrue(foundAdmin, "findAllUsersAdmin gives all admins");
-        */
     }
 
     @Test
@@ -241,6 +268,8 @@ public class UserServiceTest {
         userToDelete.setFirstName("Delete");
         userToDelete.setLastName("User");
         userToDelete.setPassword("password123");
+        userToDelete.setRole(UserRole.USER);
+        userToDelete.setProvider(Provider.LOCAL);
 
         UserDTO createdUser = userService.createUser(userToDelete);
         UUID userId = createdUser.getId();

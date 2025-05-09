@@ -1,8 +1,9 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.embeddables.Address;
-import it.unical.demacs.informatica.KairosBackend.listener.StructureAuditTrailListener;
+import it.unical.demacs.informatica.KairosBackend.listener.EntityAuditTrailListener;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -15,8 +16,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @ToString
 @Entity
-@EntityListeners(StructureAuditTrailListener.class)
-public class Structure
+@Table(name = "structure")
+@EntityListeners(EntityAuditTrailListener.class)
+public class Structure extends AuditableEntity
 {
     @Id
     @GeneratedValue
@@ -34,6 +36,9 @@ public class Structure
             @AttributeOverride(name = "zipCode", column = @Column(name = "address_zipcode"))
     })
     private Address address;
+
+    @NotNull(message = "Country cannot be null")
+    private String country;
 
     @OneToOne(mappedBy = "structure", cascade = CascadeType.ALL, orphanRemoval = true)
     private StructureImage structureImage;

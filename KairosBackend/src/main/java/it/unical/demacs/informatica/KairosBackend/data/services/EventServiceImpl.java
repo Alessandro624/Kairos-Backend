@@ -101,6 +101,7 @@ public class EventServiceImpl implements EventService{
 
     public Page<EventDTO> getAllEventsByStructure(Structure structure, Pageable pageable) {
         // TODO: NEEDS STRUCTURE REPO
+        // findAllByStructureAndVisibleTrueOrderByDateTimeAsc
         return null;
     }
 

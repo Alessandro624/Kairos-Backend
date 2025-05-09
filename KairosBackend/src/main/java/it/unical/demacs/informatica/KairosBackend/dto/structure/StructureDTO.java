@@ -1,7 +1,10 @@
 package it.unical.demacs.informatica.KairosBackend.dto.structure;
 
+import it.unical.demacs.informatica.KairosBackend.data.entities.Structure;
 import it.unical.demacs.informatica.KairosBackend.data.entities.embeddables.Address;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.List;
@@ -13,7 +16,7 @@ import java.util.UUID;
 @Builder
 @Getter
 @Setter
-public class StructureDetailsDTO
+public class StructureDTO
 {
     @NotNull(message = "Id cannot be null")
     private UUID id;

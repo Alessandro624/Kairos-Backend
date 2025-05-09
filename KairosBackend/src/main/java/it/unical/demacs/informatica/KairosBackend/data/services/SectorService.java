@@ -6,12 +6,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface SectorService {
+public interface SectorService
+{
     List<Sector> getAllSectors();
-
     Optional<Sector> getSectorById(UUID id);
-
     Sector saveSector(Sector sector);
-
     void deleteSector(UUID id);
 }

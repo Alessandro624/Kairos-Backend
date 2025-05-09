@@ -1,10 +1,13 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Category;
+import it.unical.demacs.informatica.KairosBackend.listener.EntityAuditTrailListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +19,9 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "event")
-public class Event {
+@EntityListeners(value = {AuditingEntityListener.class, EntityAuditTrailListener.class})
+@EqualsAndHashCode(of = {"id"}, callSuper = false)
+public class Event extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @UuidGenerator(style = UuidGenerator.Style.AUTO)
@@ -41,6 +46,9 @@ public class Event {
     @Size(min=1)
     @Column(name = "maxparticipants", nullable = false)
     private int maxParticipants;
+
+    @Column(name = "visible", nullable = false)
+    private boolean isVisible;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_organizer")

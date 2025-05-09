@@ -2,48 +2,85 @@ package it.unical.demacs.informatica.KairosBackend.data.services;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.Structure;
 import it.unical.demacs.informatica.KairosBackend.data.repository.StructureRepository;
+import it.unical.demacs.informatica.KairosBackend.dto.sector.SectorDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.structure.StructureCreateDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.structure.StructureDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.structure.StructureDetailsDTO;
+import it.unical.demacs.informatica.KairosBackend.exception.ResourceNotFoundException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class StructureServiceImpl implements StructureService
 {
     private final StructureRepository structureRepository;
+    private final ModelMapper modelMapper;
 
-    public StructureServiceImpl(StructureRepository structureRepository)
+    @Override
+    public StructureDetailsDTO findStructureDetailsById(UUID id)
     {
-        this.structureRepository = structureRepository;
+        Structure structure = structureRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Structure with id: " + id + " not found."));
+
+        return modelMapper.map(structure, StructureDetailsDTO.class);
     }
 
     @Override
-    public List<Structure> getAllStructures()
+    public Page<StructureDTO> findAll(int page, int size, String sortBy, Sort.Direction direction)
     {
-        return structureRepository.findAll();
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        Page<Structure> structurePage = structureRepository.findAll(pageable);
+        List<StructureDTO> dtos = structurePage.getContent()
+                .stream()
+                .map(s -> modelMapper.map(s, StructureDTO.class))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(dtos, pageable, structurePage.getTotalElements());
     }
 
     @Override
-    public Optional<Structure> getStructureById(UUID id)
+    public List<SectorDTO> findSectorsByStructureId(UUID id)
     {
-        return structureRepository.findById(id);
+        return structureRepository.findSectorsByStructureId(id);
     }
 
     @Override
-    public Structure saveStructure(Structure structure)
+    public StructureDTO create(StructureCreateDTO dto)
     {
-        return structureRepository.save(structure);
+        Structure structure = modelMapper.map(dto, Structure.class);
+        Structure savedStructure = structureRepository.save(structure);
+
+        return modelMapper.map(savedStructure, StructureDTO.class);
     }
 
     @Override
-    public void deleteStructure(UUID id)
+    public void deleteById(UUID id)
     {
+        if (!structureRepository.existsById(id))
+        {
+            throw new ResourceNotFoundException("Structure with id: " + id + " not found.");
+        }
         structureRepository.deleteById(id);
     }
 
     @Override
-    public Optional<Structure> findByName(String name) {
-        return structureRepository.findByUsername(name);
+    public StructureDetailsDTO findByName(String name)
+    {
+        StructureDTO structureDTO = structureRepository.findByName(name);
+
+        return modelMapper.map(structureDTO, StructureDetailsDTO.class);
     }
 }

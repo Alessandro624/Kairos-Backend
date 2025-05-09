@@ -17,11 +17,11 @@ public class StructurePreviewDTO
     private UUID id;
 
     @NotBlank(message = "Name cannot be blank")
-    @Size(max = 100, message = "Name must be at most 100 characters")
+    @Size(min = 1, max = 100, message = "Name must be between 1 and 100 characters.")
     private String name;
 
     @NotBlank(message = "Street cannot be blank")
-    @Size(max = 150, message = "Street must be at most 150 characters")
+    @Size(min = 1, max = 150, message = "Street must be between 1 and 100 characters.")
     private String street;
 
     private StructureImageDTO image;

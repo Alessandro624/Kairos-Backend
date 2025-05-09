@@ -124,7 +124,7 @@ public class WishlistServiceImpl implements WishlistService {
         Wishlist wishlist = wishlistRepository.findById(wishlistId).orElseThrow(() -> new ResourceNotFoundException("Wishlist " + wishlistId + " doesn't exist"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new ResourceNotFoundException("Event " + eventId + " doesn't exist"));
 
-        if(wishlist.containsEvent(event) != -1) throw new ResourceAlreadyExistsException("Wishlist "+ wishlistId+" is already shared to Event" + eventId);
+        if(wishlist.getWishedEvents().contains(event)) throw new ResourceAlreadyExistsException("Wishlist "+ wishlistId+" is already shared to Event" + eventId);
 
         wishlist.getWishedEvents().add(event);
 
@@ -140,10 +140,9 @@ public class WishlistServiceImpl implements WishlistService {
         Wishlist wishlist = wishlistRepository.findById(wishlistId).orElseThrow(() -> new ResourceNotFoundException("Wishlist " + wishlistId + " doesn't exist"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new ResourceNotFoundException("Event " + eventId + " doesn't exist"));
 
-        int pos = wishlist.containsEvent(event);
-        if(pos == -1) throw new ResourceNotFoundException("No Event " + eventId + "found in Wishlist" + wishlistId);
+        if(!wishlist.getWishedEvents().contains(event)) throw new ResourceNotFoundException("No Event " + eventId + "found in Wishlist" + wishlistId);
 
-        wishlist.getWishedEvents().remove(pos);
+        wishlist.getWishedEvents().remove(event);
         //TODO add email, or some notification system to notify shared users if wishlist is shared.
         wishlistRepository.save(wishlist);
     }

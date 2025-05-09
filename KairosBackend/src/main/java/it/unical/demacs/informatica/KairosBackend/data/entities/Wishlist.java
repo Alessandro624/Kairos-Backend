@@ -56,13 +56,5 @@ public class Wishlist extends AuditableEntity {
             inverseJoinColumns = @JoinColumn(name="user_id", nullable=false)
     )
     private List<User> sharedUsers;
-
-    //TODO add equals() and hashcode() methods in Event class in order to remove these methods.
-    public int containsEvent(Event event) {
-        for(int i = 0; i< wishedEvents.size(); i++)
-            if(wishedEvents.get(i).getId().equals(event.getId()))
-                return i;
-        return -1;
-    }
 }
 

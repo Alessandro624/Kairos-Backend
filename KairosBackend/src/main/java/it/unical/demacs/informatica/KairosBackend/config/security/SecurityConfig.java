@@ -30,6 +30,10 @@ public class SecurityConfig {
 
     private final CorsConfigurationSource corsConfigurationSource;
 
+    private final CustomOAuth2UserService customOAuth2UserService;
+
+    private final OAuth2AuthenticationHandler oAuth2AuthenticationHandler;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
@@ -53,12 +57,26 @@ public class SecurityConfig {
                         }))
                 // AUTHORIZATION TODO add other endpoints
                 .authorizeHttpRequests(a -> a
-                        .requestMatchers(HttpMethod.POST, "/v1/auth/login", "/v1/auth/refresh").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/v1/auth/login", "/v1/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/auth/oauth2/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/swagger.html", "/swagger-ui/**", "/api-docs.html", "/actuator").permitAll()
                         .anyRequest().authenticated()
                 )
-                // JWT FILTER BEFORE LOGIN TODO create a custom filter to allow multiple login providers
+                // JWT FILTER BEFORE LOGIN
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .oauth2Login(o -> o
+                        .authorizationEndpoint(a -> a.baseUri("/v1/auth/oauth2/authorize"))
+                        .redirectionEndpoint(r -> r.baseUri("/v1/auth/oauth2/callback/*"))
+                        .userInfoEndpoint(u -> u.userService(customOAuth2UserService))
+                        .successHandler(oAuth2AuthenticationHandler)
+                )
+                .logout(l -> l
+                        .logoutUrl("/v1/auth/logout")
+                        .logoutSuccessUrl("/v1/auth/logout/success")
+                        .clearAuthentication(true)
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                )
                 .build();
     }
 

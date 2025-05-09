@@ -15,10 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "/v1/auth", produces = "application/json")
@@ -58,5 +55,10 @@ public class AuthController {
         userCreateDTO.setRole(UserRole.USER);
         userService.createUser(userCreateDTO);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/logout/success")
+    public ResponseEntity<String> logoutSuccess() {
+        return ResponseEntity.ok("Logout successful");
     }
 }

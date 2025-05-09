@@ -26,8 +26,6 @@ public class Sector
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
-    // Rimosso il campo capacity e la relazione diretta con Structure
-
     @OneToMany(mappedBy = "sector", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StructureSector> structureSectors = new ArrayList<>();
 }

@@ -19,7 +19,7 @@ public class Ticket {
     @Column(name="id", nullable=false, unique=true, updatable=false,length=36)
     private UUID id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable=false)
     private User userParticipant;
 

@@ -1,5 +1,7 @@
 package it.unical.demacs.informatica.KairosBackend.dto.ticket;
 
+import it.unical.demacs.informatica.KairosBackend.dto.events.EventDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.sector.SectorDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.user.UserProfileDTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -23,11 +25,11 @@ public class TicketDTO {
     @NotNull(message = "Participant cannot be null")
     private UserProfileDTO participant;
 
-    @NotBlank(message = "Event cannot be blank")
-    private String event; // eventually waiting for EventDTO
+    @NotNull(message = "Event cannot be blank")
+    private EventDTO event;
 
-    @NotBlank(message = "Sector cannot be blank")
-    private String sector; // eventually waiting for SectorDTO
+    @NotNull(message = "Sector cannot be blank")
+    private SectorDTO sector; // eventually waiting for SectorDTO
 
     @NotNull(message = "Issue date cannot be null")
     private LocalDate issueDate;

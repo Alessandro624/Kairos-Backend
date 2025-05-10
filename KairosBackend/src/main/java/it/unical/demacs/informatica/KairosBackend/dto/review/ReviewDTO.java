@@ -1,5 +1,6 @@
 package it.unical.demacs.informatica.KairosBackend.dto.review;
 
+import it.unical.demacs.informatica.KairosBackend.dto.events.EventDTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -18,8 +19,8 @@ public class ReviewDTO {
     @NotNull(message = "Id must be defined")
     private UUID id;
 
-    @NotBlank(message = "Event cannot be null")
-    private String eventParticipated; // eventually waiting for EventDTO
+    @NotNull(message = "Event cannot be null")
+    private EventDTO eventParticipated;
 
     @NotNull(message = "Rating cannot be blank")
     private int rating;

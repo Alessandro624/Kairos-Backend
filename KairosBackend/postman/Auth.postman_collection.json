@@ -288,7 +288,7 @@
 					"oauth2": [
 						{
 							"key": "redirect_uri",
-							"value": "http://localhost:8080/v1/auth/oauth2/callback/google",
+							"value": "https://www.getpostman.com/oauth2/callback",
 							"type": "string"
 						},
 						{
@@ -336,16 +336,93 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://www.googleapis.com/oauth2/v3/userinfo",
-					"protocol": "https",
+					"raw": ""
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "OAuth2 Keycloak",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "password",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "openid profile email roles",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{KEYCLOAK_CLIENT_ID_KAIROS}}",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{KEYCLOAK_CLIENT_SECRET_KAIROS}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "http://localhost:8081/realms/kairos-realm/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "http://localhost:8081/realms/kairos-realm/protocol/openid-connect/auth",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "Keycloak OAuth getpostman",
+							"type": "string"
+						},
+						{
+							"key": "refreshTokenUrl",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/realms/kairos-realm/protocol/openid-connect/userinfo",
+					"protocol": "http",
 					"host": [
-						"www",
-						"googleapis",
-						"com"
+						"localhost"
 					],
+					"port": "8081",
 					"path": [
-						"oauth2",
-						"v3",
+						"realms",
+						"kairos-realm",
+						"protocol",
+						"openid-connect",
 						"userinfo"
 					]
 				}
@@ -360,7 +437,7 @@
 					"oauth2": [
 						{
 							"key": "redirect_uri",
-							"value": "https://localhost:8443/v1/auth/oauth2/callback/google",
+							"value": "https://www.getpostman.com/oauth2/callback",
 							"type": "string"
 						},
 						{

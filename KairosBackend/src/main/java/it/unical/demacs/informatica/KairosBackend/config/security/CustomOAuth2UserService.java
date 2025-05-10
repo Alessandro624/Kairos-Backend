@@ -65,7 +65,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         String firstName = (String) oAuth2User.getAttributes().get("given_name");
         String lastName = (String) oAuth2User.getAttributes().get("family_name");
-        String pictureUrl = (String) oAuth2User.getAttributes().get("picture");
+        // String pictureUrl = (String) oAuth2User.getAttributes().get("picture");
         boolean emailVerified = (boolean) oAuth2User.getAttributes().get("email_verified");
 
         return userRepository.findByEmail(email)

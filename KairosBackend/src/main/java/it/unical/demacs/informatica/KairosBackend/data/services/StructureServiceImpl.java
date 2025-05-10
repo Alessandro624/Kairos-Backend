@@ -2,10 +2,12 @@ package it.unical.demacs.informatica.KairosBackend.data.services;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.Structure;
 import it.unical.demacs.informatica.KairosBackend.data.repository.StructureRepository;
+import it.unical.demacs.informatica.KairosBackend.data.repository.specifications.StructureSpecifications;
 import it.unical.demacs.informatica.KairosBackend.dto.sector.SectorDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.structure.StructureCreateDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.structure.StructureDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.structure.StructureDetailsDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.structure.StructureFilterDTO;
 import it.unical.demacs.informatica.KairosBackend.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -39,10 +42,10 @@ public class StructureServiceImpl implements StructureService
     }
 
     @Override
-    public Page<StructureDTO> findAll(int page, int size, String sortBy, Sort.Direction direction)
-    {
+    public Page<StructureDTO> findAllFiltered(StructureFilterDTO filterDTO, int page, int size, String sortBy, Sort.Direction direction) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
-        Page<Structure> structurePage = structureRepository.findAll(pageable);
+        Page<Structure> structurePage = structureRepository.findAll(StructureSpecifications.filterStructure(filterDTO), pageable);
+
         List<StructureDTO> dtos = structurePage.getContent()
                 .stream()
                 .map(s -> modelMapper.map(s, StructureDTO.class))
@@ -58,6 +61,7 @@ public class StructureServiceImpl implements StructureService
     }
 
     @Override
+    @Transactional(readOnly = true)
     public StructureDTO create(StructureCreateDTO dto)
     {
         Structure structure = modelMapper.map(dto, Structure.class);
@@ -67,6 +71,7 @@ public class StructureServiceImpl implements StructureService
     }
 
     @Override
+    @Transactional(readOnly = true)
     public void deleteById(UUID id)
     {
         if (!structureRepository.existsById(id))

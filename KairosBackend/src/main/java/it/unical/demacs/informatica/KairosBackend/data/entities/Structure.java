@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,5 +45,5 @@ public class Structure extends AuditableEntity
     private StructureImage structureImage;
 
     @OneToMany(mappedBy = "structure", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Sector> sectors;
+    private List<StructureSector> structureSectors = new ArrayList<>();
 }

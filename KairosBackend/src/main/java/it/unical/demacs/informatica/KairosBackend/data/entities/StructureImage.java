@@ -11,8 +11,8 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "structure_image")
-public class StructureImage {
-
+public class StructureImage
+{
     @Id
     @GeneratedValue
     @Column(name = "id", length = 36, nullable = false, updatable = false, unique = true, columnDefinition = "UUID")

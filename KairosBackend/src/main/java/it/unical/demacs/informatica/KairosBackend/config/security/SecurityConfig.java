@@ -1,5 +1,6 @@
 package it.unical.demacs.informatica.KairosBackend.config.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.unical.demacs.informatica.KairosBackend.config.filter.JwtAuthFilter;
 import it.unical.demacs.informatica.KairosBackend.dto.ServiceError;
 import jakarta.servlet.http.HttpServletResponse;
@@ -53,7 +54,8 @@ public class SecurityConfig {
                             error.setTimestamp(Date.from(Instant.now()));
                             error.setMessage(authException.getMessage());
                             error.setUrl(request.getRequestURI());
-                            response.getWriter().write(error.toString());
+                            ObjectMapper mapper = new ObjectMapper();
+                            response.getWriter().write(mapper.writeValueAsString(error));
                         }))
                 // AUTHORIZATION TODO add other endpoints
                 .authorizeHttpRequests(a -> a

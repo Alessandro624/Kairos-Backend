@@ -13,6 +13,7 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
@@ -40,6 +41,7 @@ public class OAuth2AuthenticationHandler extends SavedRequestAwareAuthentication
 
         AuthResponse authResponse = new AuthResponse(token, refreshToken);
         response.setContentType("application/json");
-        response.getWriter().write(authResponse.toString());
+        ObjectMapper mapper = new ObjectMapper();
+        response.getWriter().write(mapper.writeValueAsString(authResponse));
     }
 }

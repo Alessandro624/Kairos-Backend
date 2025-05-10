@@ -1,9 +1,13 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities;
 
+import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Category;
+import it.unical.demacs.informatica.KairosBackend.listener.EntityAuditTrailListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -15,7 +19,9 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "event")
-public class Event {
+@EntityListeners(value = {AuditingEntityListener.class, EntityAuditTrailListener.class})
+@EqualsAndHashCode(of = {"id"}, callSuper = false)
+public class Event extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @UuidGenerator(style = UuidGenerator.Style.AUTO)
@@ -23,22 +29,26 @@ public class Event {
     private UUID id;
 
     @Size(min = 1, max = 100)
-    @NonNull
     @Column(name = "title", nullable = false)
     private String title;
 
     @Size(min = 1, max = 1000)
-    @NonNull
     @Column(name = "description", nullable = false)
     private String description;
 
-    @NonNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category", nullable = false)
+    private Category category;
+
     @Column(name = "datetime", nullable = false)
     private LocalDateTime dateTime;
 
     @Size(min=1)
     @Column(name = "maxparticipants", nullable = false)
     private int maxParticipants;
+
+    @Column(name = "visible", nullable = false)
+    private boolean isVisible;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_organizer")
@@ -47,6 +57,9 @@ public class Event {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_structure")
     private Structure structure;
+
+    @OneToMany(mappedBy = "event")
+    private List<EventSector> sectors;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EventImage> images;

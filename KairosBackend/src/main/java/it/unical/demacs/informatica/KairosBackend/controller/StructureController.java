@@ -1,58 +1,70 @@
 package it.unical.demacs.informatica.KairosBackend.controller;
 
-import it.unical.demacs.informatica.KairosBackend.data.entities.Structure;
 import it.unical.demacs.informatica.KairosBackend.data.services.StructureService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import it.unical.demacs.informatica.KairosBackend.dto.sector.SectorDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.structure.StructureCreateDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.structure.StructureDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.structure.StructureDetailsDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.structure.StructureFilterDTO;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
-@RequestMapping(path = "/api/structures", produces = "application/json")
+@RequestMapping("/api/structures")
 @CrossOrigin(origins = "http://localhost:8080")
 public class StructureController
 {
     private final StructureService structureService;
-    private static final Logger logger = LoggerFactory.getLogger(StructureController.class);
 
-    public StructureController(StructureService structureService) {
+    public StructureController(StructureService structureService)
+    {
         this.structureService = structureService;
     }
 
     @GetMapping
-    public List<Structure> getAllStructures() {
-        logger.info("Richiesta per ottenere tutte le strutture");
-        return structureService.getAllStructures();
+    public ResponseEntity<Page<StructureDTO>> getAllPreviewStructures (
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "DESC") Sort.Direction direction,
+            StructureFilterDTO structureFilterDTO
+    )
+    {
+        return ResponseEntity.ok(structureService.findAllFiltered(structureFilterDTO, page, size, sortBy, direction));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Structure> getStructure(@PathVariable UUID id)
+    public ResponseEntity<StructureDetailsDTO> getStructureDetails(@PathVariable UUID id)
     {
-        logger.info("Richiesta per ottenere la struttura con ID: {}", id);
-        return structureService.getStructureById(id)
-                .map(structure -> {
-                    logger.debug("Struttura trovata: {}", structure);
-                    return ResponseEntity.ok(structure);
-                })
-                .orElseGet(() -> {
-                    logger.warn("Struttura con ID {} non trovata", id);
-                    return ResponseEntity.notFound().build();
-                });
+        return ResponseEntity.ok(structureService.findStructureDetailsById(id));
     }
 
-    @PostMapping(consumes = "application/json")
-    public Structure createStructure(@RequestBody Structure structure) {
-        logger.info("Richiesta per creare una nuova struttura: {}", structure);
-        return structureService.saveStructure(structure);
+    @GetMapping("/{id}/sectors")
+    public ResponseEntity<List<SectorDTO>> getSectorsByStructureId(@PathVariable UUID id)
+    {
+        return ResponseEntity.ok(structureService.findSectorsByStructureId(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<StructureDTO> createStructure(@Valid @RequestBody StructureCreateDTO structureDto)
+    {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(structureService.create(structureDto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteStructure(@PathVariable UUID id) {
-        logger.info("Richiesta per eliminare la struttura con ID: {}", id);
-        structureService.deleteStructure(id);
+    public ResponseEntity<Void> deleteStructure(@PathVariable UUID id)
+    {
+        structureService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }

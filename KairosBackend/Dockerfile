@@ -8,5 +8,5 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 COPY --from=builder /app/target/*.jar kairos_app.jar
-EXPOSE 8080
+EXPOSE 8080 8443
 ENTRYPOINT ["java", "-jar", "/app/kairos_app.jar"]

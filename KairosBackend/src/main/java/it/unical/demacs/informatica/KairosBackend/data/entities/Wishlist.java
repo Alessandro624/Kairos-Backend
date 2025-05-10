@@ -1,31 +1,35 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.WishlistScope;
+import it.unical.demacs.informatica.KairosBackend.listener.EntityAuditTrailListener;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+
+//AUDITING: note that 'creator' is different
+//one is used for business logic, the other one is used for auditing.
+//'createdBy' is thought as something used internally
 
 @Entity
 @Table(name="wishlist")
 @Data
+@EntityListeners(value = {AuditingEntityListener.class, EntityAuditTrailListener.class})
 @NoArgsConstructor
-public class Wishlist {
-    //nota: i controlli (null, min, max...) a quanto pare converrebbe inserirli direttamente nei DTO.
+@EqualsAndHashCode(of = {"id"}, callSuper = false)
+public class Wishlist extends AuditableEntity {
     @Id
     @UuidGenerator
-    @Column(name="id", nullable=false, unique=true, updatable=false,length=36)
+    @Column(name="id", columnDefinition = "uuid", nullable=false, unique=true, updatable=false,length=36)
     private UUID id;
 
     @Column(nullable=false,length=50)
     private String name;
-
-    @Column(name = "creation_date", nullable=false)
-    private LocalDate creationDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
@@ -36,7 +40,6 @@ public class Wishlist {
     @JoinColumn(name = "creator_id", nullable=false)
     private User creator;
 
-    //TODO add list of wishlists in Event entity
     @ManyToMany()
     @JoinTable(
             name = "wishlist_event",
@@ -45,7 +48,7 @@ public class Wishlist {
     )
     private List<Event> wishedEvents;
 
-    //TODO change @OneToMany in @ManyToMany in User entity
+    //TODO change into two one-to-many mapping
     @ManyToMany
     @JoinTable(
             name="wishlist_user",
@@ -53,5 +56,13 @@ public class Wishlist {
             inverseJoinColumns = @JoinColumn(name="user_id", nullable=false)
     )
     private List<User> sharedUsers;
+
+    //TODO add equals() and hashcode() methods in Event class in order to remove these methods.
+    public int containsEvent(Event event) {
+        for(int i = 0; i< wishedEvents.size(); i++)
+            if(wishedEvents.get(i).getId().equals(event.getId()))
+                return i;
+        return -1;
+    }
 }
 

@@ -16,11 +16,11 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     Optional<User> findByEmail(String email);
 
+    Optional<User> findByUsernameOrEmail(String username, String email);
+
     boolean existsByUsername(String username);
 
     boolean existsByEmail(String email);
-
-    // TODO maybe adding a findByUsernameOrEmail
 
     // TODO it can be useful for a cleaning scheduler
     Page<User> findAllByEmailVerifiedFalse(Pageable pageable);

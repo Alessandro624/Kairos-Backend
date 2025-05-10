@@ -1,9 +1,11 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -12,22 +14,18 @@ import java.util.UUID;
 @AllArgsConstructor
 @ToString
 @Entity
+@Table(name = "sector")
 public class Sector
 {
     @Id
     @GeneratedValue
     @UuidGenerator
-    @Column(name = "ID", nullable = false, unique = true, updatable = false, length = 36)
+    @Column(name = "id", nullable = false, unique = true, updatable = false, length = 36)
     private UUID id;
 
-    @Column(name = "NAME", nullable = false, length = 50)
+    @Column(name = "name", nullable = false, length = 50)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "STRUCTURE_ID", nullable = false)
-    private Structure structure;
-
-    @Min(0)
-    @Column(name = "CAPACITY", nullable = false)
-    private Integer capacity;
+    @OneToMany(mappedBy = "sector", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StructureSector> structureSectors = new ArrayList<>();
 }

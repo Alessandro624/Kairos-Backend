@@ -30,13 +30,13 @@ public class WishlistDTO {
     private WishlistScope scope;
 
     @NotNull(message = "Creator must be defined")
-    private UserWishlistDTO creator;
+    private UUID creator;
 
-    private List<EventWishlistDTO> wishedEvents;
+    private List<UUID> wishedEvents;
 
-    private List<UserWishlistDTO> sharedUsers;
+    private List<UUID> sharedUsers;
 
-    //used mainly for testing (maybe)
+    /*used mainly for testing (maybe)
     public void addWishedEvent(EventWishlistDTO e){
         wishedEvents.add(e);
     }
@@ -44,4 +44,5 @@ public class WishlistDTO {
     public void addSharedUser(UserWishlistDTO u){
         sharedUsers.add(u);
     }
+     */
 }

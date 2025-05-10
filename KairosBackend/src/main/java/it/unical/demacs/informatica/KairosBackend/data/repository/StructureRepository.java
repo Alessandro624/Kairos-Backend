@@ -12,9 +12,14 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
 @Repository
-public interface StructureRepository extends ListCrudRepository<Structure, UUID>, PagingAndSortingRepository<Structure, UUID>
-{
+public interface StructureRepository extends
+        ListCrudRepository<Structure, UUID>,
+        PagingAndSortingRepository<Structure, UUID>,
+        JpaSpecificationExecutor<Structure> {
+
     @Query("SELECT ss.sector FROM StructureSector ss WHERE ss.structure.id = :structureId")
     List<SectorDTO> findSectorsByStructureId(@Param("structureId") UUID structureId);
 

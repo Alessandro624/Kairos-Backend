@@ -14,8 +14,10 @@ import java.util.UUID;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, UUID> {
 
-    Page<Review> findAllByEventParticipated(Event event, Pageable pageable);
     Optional<Review> findByTicketReference(Ticket ticketReference);
+    Page<Review> findAllByTicketReferenceUserParticipantId(UUID id, Pageable pageable);
+    Page<Review> findAllByEventParticipated(Event event, Pageable pageable);
+    Page<Review> findAllByRating(Integer rating, Pageable pageable);
     Page<Review> findAllByRatingAndEventParticipated(int rating, Event event, Pageable pageable);
 
 }

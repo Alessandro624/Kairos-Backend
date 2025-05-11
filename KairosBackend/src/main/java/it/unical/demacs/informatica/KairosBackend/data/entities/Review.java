@@ -36,4 +36,6 @@ public class Review {
 
     @Column(name = "comment", nullable = false, length = 500)
     private String comment;
+
+    // Forse aggiungere una publicationDate?
 }

@@ -69,7 +69,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(a -> a
                         .requestMatchers(HttpMethod.POST, "/v1/auth/login", "/v1/auth/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/auth/oauth2/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/swagger.html", "/swagger-ui/**", "/api-docs.html", "/actuator/**").permitAll()
+                        .requestMatchers("/swagger.html", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 // JWT FILTER BEFORE LOGIN
@@ -79,6 +79,7 @@ public class SecurityConfig {
                         .redirectionEndpoint(r -> r.baseUri("/v1/auth/oauth2/callback/*"))
                         .userInfoEndpoint(u -> u.userService(customOAuth2UserService))
                         .successHandler(oAuth2AuthenticationHandler)
+                        .failureUrl("/v1/auth/oauth2/login/failure")
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt

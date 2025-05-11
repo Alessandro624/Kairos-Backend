@@ -61,4 +61,9 @@ public class AuthController {
     public ResponseEntity<String> logoutSuccess() {
         return ResponseEntity.ok("Logout successful");
     }
+
+    @GetMapping("/oauth2/login/failure")
+    public ResponseEntity<String> oAuth2LoginFailure() {
+        return ResponseEntity.badRequest().body("Login with OAuth2 failed");
+    }
 }

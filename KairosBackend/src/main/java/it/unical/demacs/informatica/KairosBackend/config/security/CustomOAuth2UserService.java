@@ -35,6 +35,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         try {
             User user = getUserByOAuth2User(oAuth2User, provider);
+
+            if (user.getProvider() != provider) {
+                throw new OAuth2AuthenticationException("User with email " + user.getEmail() + " already exists");
+            }
+            
             return new OAuth2User() {
                 @Override
                 public Map<String, Object> getAttributes() {

@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -34,6 +35,10 @@ public class OAuth2AuthenticationHandler extends SavedRequestAwareAuthentication
         Provider provider = Provider.valueOf(registrationId.toUpperCase());
 
         User user = customOAuth2UserService.getUserByOAuth2User(oAuth2User, provider);
+
+        if (user.getProvider() != provider) {
+            throw new OAuth2AuthenticationException("User with email " + user.getEmail() + " already exists");
+        }
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
         String token = jwtService.generateToken(userDetails);

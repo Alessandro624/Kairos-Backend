@@ -1,9 +1,11 @@
 package it.unical.demacs.informatica.KairosBackend.config.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.unical.demacs.informatica.KairosBackend.config.filter.JwtAuthFilter;
 import it.unical.demacs.informatica.KairosBackend.dto.ServiceError;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,6 +17,10 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -29,6 +35,13 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
 
     private final CorsConfigurationSource corsConfigurationSource;
+
+    private final CustomOAuth2UserService customOAuth2UserService;
+
+    private final OAuth2AuthenticationHandler oAuth2AuthenticationHandler;
+
+    @Value("${spring.security.oauth2.client.provider.keycloak.issuer-uri}")
+    private String issuerUri;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -49,17 +62,54 @@ public class SecurityConfig {
                             error.setTimestamp(Date.from(Instant.now()));
                             error.setMessage(authException.getMessage());
                             error.setUrl(request.getRequestURI());
-                            response.getWriter().write(error.toString());
+                            ObjectMapper mapper = new ObjectMapper();
+                            response.getWriter().write(mapper.writeValueAsString(error));
                         }))
                 // AUTHORIZATION TODO add other endpoints
                 .authorizeHttpRequests(a -> a
-                        .requestMatchers(HttpMethod.POST, "/v1/auth/login", "/v1/auth/refresh").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/swagger.html", "/swagger-ui/**", "/api-docs.html", "/actuator").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/v1/auth/login", "/v1/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/auth/oauth2/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/swagger.html", "/swagger-ui/**", "/api-docs.html", "/actuator/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                // JWT FILTER BEFORE LOGIN TODO create a custom filter to allow multiple login providers
+                // JWT FILTER BEFORE LOGIN
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .oauth2Login(o -> o
+                        .authorizationEndpoint(a -> a.baseUri("/v1/auth/oauth2/authorize"))
+                        .redirectionEndpoint(r -> r.baseUri("/v1/auth/oauth2/callback/*"))
+                        .userInfoEndpoint(u -> u.userService(customOAuth2UserService))
+                        .successHandler(oAuth2AuthenticationHandler)
+                )
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                        )
+                )
+                .logout(l -> l
+                        .logoutUrl("/v1/auth/logout")
+                        .logoutSuccessUrl("/v1/auth/logout/success")
+                        .clearAuthentication(true)
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                )
                 .build();
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        return JwtDecoders.fromIssuerLocation(issuerUri);
+    }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+
+        grantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
+
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+        return jwtAuthenticationConverter;
     }
 
     @Bean

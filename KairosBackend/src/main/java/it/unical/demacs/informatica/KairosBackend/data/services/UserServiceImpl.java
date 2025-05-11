@@ -79,7 +79,8 @@ public class UserServiceImpl implements UserService {
         }
         User newUser = modelMapper.map(userDTO, User.class);
         newUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        newUser.setEmailVerified(false);
+        // TODO check provider if local then this should be false
+        newUser.setEmailVerified(true);
         User savedUser = userRepository.save(newUser);
         // TODO send verification email or handle it with another service
         // TODO handle other object creations

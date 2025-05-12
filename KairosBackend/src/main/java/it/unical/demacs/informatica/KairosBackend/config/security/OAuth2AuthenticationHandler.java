@@ -60,6 +60,6 @@ public class OAuth2AuthenticationHandler extends SavedRequestAwareAuthentication
         ObjectMapper mapper = new ObjectMapper();
         response.getWriter().write(mapper.writeValueAsString(authResponse));
 
-        super.onAuthenticationSuccess(request, response, newToken);
+        // super.onAuthenticationSuccess(request, response, newToken);
     }
 }

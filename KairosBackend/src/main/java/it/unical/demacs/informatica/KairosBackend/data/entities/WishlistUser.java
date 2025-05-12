@@ -1,12 +1,19 @@
 package it.unical.demacs.informatica.KairosBackend.data.entities;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.util.UUID;
 
 @Entity
-@Table(name = "wishlist_user")
+@Table(name = "wishlist_user",
+        uniqueConstraints = { @UniqueConstraint(columnNames = { "wishlist_id", "user_id" }) })
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(of = {"id"}, callSuper = false)
 public class WishlistUser {
     @Id
     @UuidGenerator

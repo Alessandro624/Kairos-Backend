@@ -18,11 +18,15 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -47,38 +51,52 @@ public class UserServiceTest {
     }
 
     @BeforeEach
-    public void setupTestData() throws IOException {
+    public void setUp() throws IOException {
+        setUpAuditor();
         if (!isInitialized) {
-            CSVParser userCsv = CSVFormat.DEFAULT.withDelimiter(';')
-                    .withHeader("username", "email", "firstName", "lastName", "password", "phoneNumber", "role", "provider", "emailVerified")
-                    .withSkipHeaderRecord(true)
-                    .parse(new InputStreamReader(users.getInputStream()));
+            setupTestData();
+        }
+    }
 
-            for (CSVRecord record : userCsv) {
-                UserCreateDTO user = insertUserInDB(
-                        record.get("username"),
-                        record.get("email"),
-                        record.get("firstName"),
-                        record.get("lastName"),
-                        record.get("password"),
-                        record.get("phoneNumber"),
-                        UserRole.valueOf(record.get("role")),
-                        Provider.valueOf(record.get("provider"))
-                );
+    private void setUpAuditor() {
+        // To see if auditing works
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(new UsernamePasswordAuthenticationToken("testAuditUser", "Password123", Collections.emptyList()));
+        SecurityContextHolder.setContext(context);
+    }
 
-                if (testUserId == null && record.get("role").equals("USER")) {
-                    Optional<UserDTO> createdUser = userService.findByUsername(user.getUsername());
-                    testUserId = createdUser.map(UserDTO::getId).orElse(null);
-                }
+    private void setupTestData() throws IOException {
+        assert !isInitialized;
 
-                if (adminUserId == null && record.get("role").equals("ADMIN")) {
-                    Optional<UserDTO> createdUser = userService.findByUsername(user.getUsername());
-                    adminUserId = createdUser.map(UserDTO::getId).orElse(null);
-                }
+        CSVParser userCsv = CSVFormat.DEFAULT.withDelimiter(';')
+                .withHeader("username", "email", "firstName", "lastName", "password", "phoneNumber", "role", "provider", "emailVerified")
+                .withSkipHeaderRecord(true)
+                .parse(new InputStreamReader(users.getInputStream()));
+
+        for (CSVRecord record : userCsv) {
+            UserCreateDTO user = insertUserInDB(
+                    record.get("username"),
+                    record.get("email"),
+                    record.get("firstName"),
+                    record.get("lastName"),
+                    record.get("password"),
+                    record.get("phoneNumber"),
+                    UserRole.valueOf(record.get("role")),
+                    Provider.valueOf(record.get("provider"))
+            );
+
+            if (testUserId == null && record.get("role").equals("USER")) {
+                Optional<UserDTO> createdUser = userService.findByUsername(user.getUsername());
+                testUserId = createdUser.map(UserDTO::getId).orElse(null);
             }
 
-            isInitialized = true;
+            if (adminUserId == null && record.get("role").equals("ADMIN")) {
+                Optional<UserDTO> createdUser = userService.findByUsername(user.getUsername());
+                adminUserId = createdUser.map(UserDTO::getId).orElse(null);
+            }
         }
+
+        isInitialized = true;
     }
 
     private UserCreateDTO insertUserInDB(

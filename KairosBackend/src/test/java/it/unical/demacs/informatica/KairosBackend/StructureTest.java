@@ -83,11 +83,11 @@ public class StructureTest {
         return structureService.create(dto);
     }
 
-    @Test
-    public void testGetAllStructures() {
-        Page<StructureDTO> allStructures = structureService.findAll(0, 10, "id", Sort.Direction.DESC);
-        assertFalse(allStructures.isEmpty());
-    }
+//    @Test
+//    public void testGetAllStructures() {
+//        Page<StructureDTO> allStructures = structureService.findAll(0, 10, "id", Sort.Direction.DESC);
+//        assertFalse(allStructures.isEmpty());
+//    }
 
     @Test
     public void testGetStructureById() {

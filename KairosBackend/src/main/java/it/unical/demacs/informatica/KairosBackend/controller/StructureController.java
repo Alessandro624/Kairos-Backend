@@ -5,6 +5,7 @@ import it.unical.demacs.informatica.KairosBackend.dto.sector.SectorDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.structure.StructureCreateDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.structure.StructureDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.structure.StructureDetailsDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.structure.StructureFilterDTO;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -32,9 +33,13 @@ public class StructureController
     @GetMapping
     public ResponseEntity<Page<StructureDTO>> getAllPreviewStructures (
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size)
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "DESC") Sort.Direction direction,
+            StructureFilterDTO structureFilterDTO
+    )
     {
-        return ResponseEntity.ok(structureService.findAll(page, size, "id", Sort.Direction.DESC));
+        return ResponseEntity.ok(structureService.findAllFiltered(structureFilterDTO, page, size, sortBy, direction));
     }
 
     @GetMapping("/{id}")

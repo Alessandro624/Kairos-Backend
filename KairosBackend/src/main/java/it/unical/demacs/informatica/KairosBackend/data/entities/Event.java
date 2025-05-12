@@ -58,7 +58,7 @@ public class Event extends AuditableEntity {
     @JoinColumn(name = "id_structure")
     private Structure structure;
 
-    @OneToMany(mappedBy = "eventsector")
+    @OneToMany(mappedBy = "event")
     private List<EventSector> sectors;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)

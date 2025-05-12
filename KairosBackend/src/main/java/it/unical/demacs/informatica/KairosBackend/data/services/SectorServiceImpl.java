@@ -9,7 +9,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class SectorServiceImpl implements SectorService {
+public class SectorServiceImpl implements SectorService
+{
     private final SectorRepository sectorRepository;
 
     public SectorServiceImpl(SectorRepository sectorRepository) {

@@ -3,9 +3,12 @@ package it.unical.demacs.informatica.KairosBackend.data.services;
 import it.unical.demacs.informatica.KairosBackend.data.entities.Event;
 import it.unical.demacs.informatica.KairosBackend.data.entities.User;
 import it.unical.demacs.informatica.KairosBackend.data.entities.Wishlist;
+import it.unical.demacs.informatica.KairosBackend.data.entities.WishlistUser;
+import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.WishlistScope;
 import it.unical.demacs.informatica.KairosBackend.data.repository.EventRepository;
 import it.unical.demacs.informatica.KairosBackend.data.repository.UserRepository;
 import it.unical.demacs.informatica.KairosBackend.data.repository.WishlistRepository;
+import it.unical.demacs.informatica.KairosBackend.data.repository.WishlistUserRepository;
 import it.unical.demacs.informatica.KairosBackend.data.repository.specifications.WishlistSpecifications;
 import it.unical.demacs.informatica.KairosBackend.dto.wishlist.WishlistFilterDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.wishlist.*;
@@ -30,6 +33,7 @@ public class WishlistServiceImpl implements WishlistService {
     private final WishlistRepository wishlistRepository;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
+    private final WishlistUserRepository wishlistUserRepository;
     private final ModelMapper modelMapper;
 
 
@@ -96,10 +100,19 @@ public class WishlistServiceImpl implements WishlistService {
         Wishlist wishlist = wishlistRepository.findById(wishlistId).orElseThrow(() -> new ResourceNotFoundException("Wishlist " + wishlistId + " doesn't exist"));
 
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User " + userId + " doesn't exist"));
-
         if(wishlist.getSharedUsers().contains(user)) throw new ResourceAlreadyExistsException("Wishlist "+ wishlistId+" is already shared to User" + userId);
 
-        wishlist.getSharedUsers().add(user);
+        if(wishlist.getScope() == WishlistScope.PRIVATE)
+            wishlist.setScope(WishlistScope.SHARED);
+
+        WishlistUser wu = new WishlistUser();
+        wu.setWishlist(wishlist);
+        wu.setUser(user);
+        //for now, it will be false.
+        wu.setAccepted(false);
+
+        //TODO add other service method that updates the accepted parameter.
+        wishlist.getSharedUsers().add(wu);
 
         //TODO add email, or some notification system to notify added user.
         Wishlist saved =  wishlistRepository.save(wishlist);
@@ -111,9 +124,14 @@ public class WishlistServiceImpl implements WishlistService {
     public void removeUserFromWishlist(UUID wishlistId, UUID userId) {
         Wishlist wishlist = wishlistRepository.findById(wishlistId).orElseThrow(() -> new ResourceNotFoundException("Wishlist " + wishlistId + " doesn't exist"));
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User " + userId + " doesn't exist"));
+        WishlistUser wishlistUser = wishlistUserRepository.findByUserAndWishlist(user,wishlist).orElseThrow(() -> new ResourceNotFoundException("Wishlist " + wishlistId + " isn't shared with user " + userId));
 
-        if(wishlist.getSharedUsers().contains(user)) throw new ResourceNotFoundException("No User " + userId + "found in Wishlist" + wishlistId);
-        wishlist.getSharedUsers().remove(user);
+        if(!wishlist.getSharedUsers().contains(wishlistUser)) throw new ResourceNotFoundException("No User " + userId + "found in Wishlist" + wishlistId);
+        wishlist.getSharedUsers().remove(wishlistUser);
+
+        //change wishlist state if it was the only element of the list.
+        if(wishlist.getSharedUsers().isEmpty())
+            wishlist.setScope(WishlistScope.PRIVATE);
 
         //TODO add email, or some notification system to notify removed user.
         wishlistRepository.save(wishlist);

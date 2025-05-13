@@ -38,8 +38,8 @@ services:
       GOOGLE_CLIENT_SECRET_KAIROS: ${GOOGLE_CLIENT_SECRET_KAIROS}
       KEYCLOAK_CLIENT_ID_KAIROS: ${KEYCLOAK_CLIENT_ID_KAIROS}
       KEYCLOAK_CLIENT_SECRET_KAIROS: ${KEYCLOAK_CLIENT_SECRET_KAIROS}
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8081/realms/kairos-realm
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8081/realms/kairos-realm/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER_URI: http://keycloak:8081/realms/kairos-realm
+      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_JWT_SET_URI: http://keycloak:8081/realms/kairos-realm/protocol/openid-connect/certs
 
   keycloak_db:
     image: postgres:17-alpine

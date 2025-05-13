@@ -4,12 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.unical.demacs.informatica.KairosBackend.data.entities.User;
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Provider;
 import it.unical.demacs.informatica.KairosBackend.dto.auth.AuthResponse;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -29,27 +27,24 @@ public class OAuth2AuthenticationHandler extends SavedRequestAwareAuthentication
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws IOException, ServletException {
+                                        Authentication authentication) throws IOException {
         OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
+        getOrCreateUser(response, oauthToken, oAuth2User);
+
+        // super.onAuthenticationSuccess(request, response, newToken);
+    }
+
+    private void getOrCreateUser(HttpServletResponse response, OAuth2AuthenticationToken oauthToken, OAuth2User oAuth2User) throws IOException {
         String registrationId = oauthToken.getAuthorizedClientRegistrationId();
         Provider provider = Provider.valueOf(registrationId.toUpperCase());
 
-        User user = customOAuth2UserService.getUserByOAuth2User(oAuth2User, provider);
+        User user = customOAuth2UserService.getUserByOAuth2User(oAuth2User.getAttributes(), provider);
 
         if (user.getProvider() != provider) {
             throw new OAuth2AuthenticationException("User with email " + user.getEmail() + " already exists");
         }
-
-        OAuth2User updatedOAuth2User = customOAuth2UserService.getOAuth2User(oAuth2User, user);
-
-        OAuth2AuthenticationToken newToken = new OAuth2AuthenticationToken(
-                updatedOAuth2User,
-                updatedOAuth2User.getAuthorities(),
-                registrationId);
-
-        SecurityContextHolder.getContext().setAuthentication(newToken);
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
         String token = jwtService.generateToken(userDetails);
@@ -59,7 +54,5 @@ public class OAuth2AuthenticationHandler extends SavedRequestAwareAuthentication
         response.setContentType("application/json");
         ObjectMapper mapper = new ObjectMapper();
         response.getWriter().write(mapper.writeValueAsString(authResponse));
-
-        // super.onAuthenticationSuccess(request, response, newToken);
     }
 }

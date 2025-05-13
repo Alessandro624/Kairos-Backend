@@ -31,7 +31,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         Provider provider = Provider.valueOf(registrationId.toUpperCase());
 
         try {
-            User user = getUserByOAuth2User(oAuth2User, provider);
+            User user = getUserByOAuth2User(oAuth2User.getAttributes(), provider);
 
             if (user.getProvider() != provider) {
                 throw new OAuth2AuthenticationException("User with email " + user.getEmail() + " already exists");
@@ -63,21 +63,21 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         };
     }
 
-    public User getUserByOAuth2User(OAuth2User oAuth2User, Provider provider) {
-        String email = (String) oAuth2User.getAttributes().get("email");
+    public User getUserByOAuth2User(Map<String, Object> attributes, Provider provider) {
+        String email = (String) attributes.get("email");
 
         if (email == null) {
             throw new OAuth2AuthenticationException("Email not found in OAuth2 provider");
         }
 
-        String firstName = (String) oAuth2User.getAttributes().get("given_name");
-        String lastName = (String) oAuth2User.getAttributes().get("family_name");
-        // String pictureUrl = (String) oAuth2User.getAttributes().get("picture");
-        boolean emailVerified = (boolean) oAuth2User.getAttributes().get("email_verified");
+        String firstName = (String) attributes.get("given_name");
+        String lastName = (String) attributes.get("family_name");
+        // String pictureUrl = (String) attributes.get("picture");
+        boolean emailVerified = (boolean) attributes.get("email_verified");
 
-        Collection<GrantedAuthority> authorities = extractRoles(oAuth2User.getAttributes());
+        Collection<GrantedAuthority> authorities = extractRoles(attributes);
 
-        UserRole role = authorities.isEmpty() ? UserRole.USER : UserRole.valueOf(authorities.iterator().next().getAuthority().replace("ROLE_", "").toUpperCase());
+        UserRole role = extractUserRole(authorities);
 
         return userRepository.findByEmail(email)
                 .orElseGet(() -> {
@@ -92,6 +92,24 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                     newUser.setEmailVerified(emailVerified);
                     return userRepository.save(newUser);
                 });
+    }
+
+    private UserRole extractUserRole(Collection<GrantedAuthority> authorities) {
+        return authorities.stream()
+                .map(GrantedAuthority::getAuthority)
+                .filter(auth -> auth.startsWith("ROLE_"))
+                .map(auth -> auth.replace("ROLE_", "").toUpperCase())
+                .filter(roleName -> {
+                    try {
+                        UserRole.valueOf(roleName);
+                        return true;
+                    } catch (IllegalArgumentException ex) {
+                        return false;
+                    }
+                })
+                .map(UserRole::valueOf)
+                .findFirst()
+                .orElse(UserRole.USER);
     }
 
     private Collection<GrantedAuthority> extractRoles(Map<String, Object> claims) {

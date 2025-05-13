@@ -33,8 +33,8 @@ public interface EventRepository extends JpaRepository<Event, UUID>, PagingAndSo
                                                    @Param("fromDate") LocalDateTime now, Pageable pageable);
 
     // posso rimuoverli?
-    Page<Event> findAllByOrganizerAndVisibleTrueOrderByDateTimeAsc(User user, Pageable pageable);
-    Page<Event> findAllByDateTimeBetweenAndVisibleTrueOrderByDateTimeAsc(LocalDateTime from, LocalDateTime to, Pageable pageable);
-    Page<Event> findAllByStructureAndVisibleTrueOrderByDateTimeAsc(Structure structure, Pageable pageable);
-    Page<Event> findAllByCategoryAndVisibleTrueOrderByDateTimeAsc(Category category, Pageable pageable);
+    Page<Event> findAllByOrganizerOrderByDateTimeAsc(User user, Pageable pageable);
+    Page<Event> findAllByDateTimeBetweenOrderByDateTimeAsc(LocalDateTime from, LocalDateTime to, Pageable pageable);
+    Page<Event> findAllByStructureOrderByDateTimeAsc(Structure structure, Pageable pageable);
+    Page<Event> findAllByCategoryOrderByDateTimeAsc(Category category, Pageable pageable);
 }

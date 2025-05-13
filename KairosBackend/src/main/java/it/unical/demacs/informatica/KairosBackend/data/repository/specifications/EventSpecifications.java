@@ -2,8 +2,9 @@ package it.unical.demacs.informatica.KairosBackend.data.repository.specification
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.Event;
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Category;
-import jakarta.persistence.criteria.Predicate;
+
 import lombok.Data;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-final class EventSpecifications {
+public final class EventSpecifications {
     private EventSpecifications() {}
 
     @Data
@@ -29,7 +30,7 @@ final class EventSpecifications {
         return "%" + p + "%";
     }
 
-    static Specification<Event> buildSpecification(Filter filter) {
+    public static Specification<Event> buildSpecification(Filter filter) {
         return ((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 

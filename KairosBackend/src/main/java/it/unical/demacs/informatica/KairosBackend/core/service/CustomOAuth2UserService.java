@@ -1,10 +1,11 @@
-package it.unical.demacs.informatica.KairosBackend.config.security;
+package it.unical.demacs.informatica.KairosBackend.core.service;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.User;
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Provider;
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.UserRole;
 import it.unical.demacs.informatica.KairosBackend.data.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -18,6 +19,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     private final UserRepository userRepository;
 
@@ -25,17 +27,23 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) {
+        log.debug("Loading OAuth2 user for registration ID: {}",
+                oAuth2UserRequest.getClientRegistration().getRegistrationId());
+
         OAuth2User oAuth2User = defaultOAuth2UserService.loadUser(oAuth2UserRequest);
 
         String registrationId = oAuth2UserRequest.getClientRegistration().getRegistrationId();
         Provider provider = Provider.valueOf(registrationId.toUpperCase());
 
+        log.debug("Retrieving user information for provider: {}", provider);
         User user = getUserByOAuth2User(oAuth2User.getAttributes(), provider);
 
+        log.info("Successfully loaded OAuth2 user: {}", user.getUsername());
         return getOAuth2User(oAuth2User, user);
     }
 
     public OAuth2User getOAuth2User(OAuth2User oAuth2User, User user) {
+        log.debug("Creating custom OAuth2User instance for user: {}", user.getUsername());
         return new OAuth2User() {
             @Override
             public Map<String, Object> getAttributes() {
@@ -55,18 +63,21 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     public User getUserByOAuth2User(Map<String, Object> attributes, Provider provider) {
+        log.debug("Processing OAuth2 user attributes");
         String email = (String) attributes.get("email");
 
         if (email == null) {
             throw new OAuth2AuthenticationException("Email not found");
         }
 
+        log.debug("Searching for existing user with email: {}", email);
         return userRepository.findByEmail(email)
                 .map(existingUser -> validateProvider(existingUser, provider))
                 .orElseGet(() -> createNewUser(attributes, provider, email));
     }
 
     private User validateProvider(User existingUser, Provider provider) {
+        log.debug("Validating provider for existing user: {}", existingUser.getUsername());
         if (existingUser.getProvider() == provider) {
             return existingUser;
         } else {
@@ -75,6 +86,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     private User createNewUser(Map<String, Object> attributes, Provider provider, String email) {
+        log.debug("Creating new user with email: {} for provider: {}", email, provider);
         User user = new User();
         user.setEmail(email);
         user.setUsername(email.split("@")[0]);
@@ -88,6 +100,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     private UserRole extractUserRole(Collection<GrantedAuthority> authorities) {
+        log.debug("Extracting user role from authorities");
         return authorities.stream()
                 .map(GrantedAuthority::getAuthority)
                 .filter(auth -> auth.startsWith("ROLE_"))
@@ -106,6 +119,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     private Collection<GrantedAuthority> extractRoles(Map<String, Object> claims) {
+        log.debug("Extracting roles from claims");
         Set<GrantedAuthority> authorities = new HashSet<>();
         extractRolesFromRealmAccess(claims, authorities);
         extractRolesFromResourceAccess(claims, authorities);
@@ -115,6 +129,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     private void extractRolesFromRealmAccess(Map<String, Object> claims, Set<GrantedAuthority> authorities) {
         Map<String, Object> realmAccess = getMap(claims, "realm_access");
         if (realmAccess != null) {
+            log.debug("Processing realm access roles");
             List<String> roles = getList(realmAccess);
             addRoles(roles, authorities);
         }
@@ -124,6 +139,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     private void extractRolesFromResourceAccess(Map<String, Object> claims, Set<GrantedAuthority> authorities) {
         Map<String, Object> resourceAccess = getMap(claims, "resource_access");
         if (resourceAccess != null) {
+            log.debug("Processing resource access roles");
             resourceAccess.values().forEach(clientAccess -> {
                 if (clientAccess instanceof Map) {
                     List<String> roles = getList((Map<String, Object>) clientAccess);
@@ -135,6 +151,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     private void addRoles(List<String> roles, Set<GrantedAuthority> authorities) {
         if (roles != null) {
+            log.debug("Adding {} roles to authorities", roles.size());
             roles.forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role)));
         }
     }

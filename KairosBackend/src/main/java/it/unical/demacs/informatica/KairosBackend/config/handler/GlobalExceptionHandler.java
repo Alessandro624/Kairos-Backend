@@ -92,7 +92,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(OAuth2AuthenticationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ServiceError onOAuth2AuthenticationException(WebRequest req, MethodArgumentTypeMismatchException ex) {
+    public ServiceError onOAuth2AuthenticationException(WebRequest req, OAuth2AuthenticationException ex) {
         log.info(messageReader.getMessage("exceptions.oauth2_authentication", ex.getMessage()));
         return errorResponse(req, ex.getMessage());
     }

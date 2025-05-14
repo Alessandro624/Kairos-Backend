@@ -19,6 +19,10 @@ public class PhoneNumberValidator implements ConstraintValidator<PhoneNumber, St
 
     @Override
     public boolean isValid(String phone, ConstraintValidatorContext context) {
+        if (phone == null) {
+            return true;
+        }
+
         if (phone.length() < min || phone.length() > max) {
             setMessage(context, "Phone number must be between " + min + " and " + max + " characters");
             return false;

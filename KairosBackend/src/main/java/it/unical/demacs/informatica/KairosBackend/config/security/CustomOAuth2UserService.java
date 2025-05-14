@@ -30,18 +30,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String registrationId = oAuth2UserRequest.getClientRegistration().getRegistrationId();
         Provider provider = Provider.valueOf(registrationId.toUpperCase());
 
-        try {
-            User user = getUserByOAuth2User(oAuth2User.getAttributes(), provider);
+        User user = getUserByOAuth2User(oAuth2User.getAttributes(), provider);
 
-            if (user.getProvider() != provider) {
-                throw new OAuth2AuthenticationException("User with email " + user.getEmail() + " already exists");
-            }
-
-            return getOAuth2User(oAuth2User, user);
-
-        } catch (Exception e) {
-            throw new OAuth2AuthenticationException("Failed to load user information");
-        }
+        return getOAuth2User(oAuth2User, user);
     }
 
     public OAuth2User getOAuth2User(OAuth2User oAuth2User, User user) {
@@ -67,31 +58,33 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String email = (String) attributes.get("email");
 
         if (email == null) {
-            throw new OAuth2AuthenticationException("Email not found in OAuth2 provider");
+            throw new OAuth2AuthenticationException("Email not found");
         }
 
-        String firstName = (String) attributes.get("given_name");
-        String lastName = (String) attributes.get("family_name");
-        // String pictureUrl = (String) attributes.get("picture");
-        boolean emailVerified = (boolean) attributes.get("email_verified");
-
-        Collection<GrantedAuthority> authorities = extractRoles(attributes);
-
-        UserRole role = extractUserRole(authorities);
-
         return userRepository.findByEmail(email)
-                .orElseGet(() -> {
-                    User newUser = new User();
-                    newUser.setEmail(email);
-                    newUser.setUsername(email.split("@")[0]);
-                    newUser.setPassword(UUID.randomUUID().toString());
-                    newUser.setFirstName(firstName);
-                    newUser.setLastName(lastName);
-                    newUser.setRole(role);
-                    newUser.setProvider(provider);
-                    newUser.setEmailVerified(emailVerified);
-                    return userRepository.save(newUser);
-                });
+                .map(existingUser -> validateProvider(existingUser, provider))
+                .orElseGet(() -> createNewUser(attributes, provider, email));
+    }
+
+    private User validateProvider(User existingUser, Provider provider) {
+        if (existingUser.getProvider() == provider) {
+            return existingUser;
+        } else {
+            throw new OAuth2AuthenticationException("User already registered with another provider");
+        }
+    }
+
+    private User createNewUser(Map<String, Object> attributes, Provider provider, String email) {
+        User user = new User();
+        user.setEmail(email);
+        user.setUsername(email.split("@")[0]);
+        user.setPassword(UUID.randomUUID().toString());
+        user.setFirstName(attributes.get("given_name").toString());
+        user.setLastName(attributes.get("family_name").toString());
+        user.setEmailVerified(Boolean.parseBoolean(attributes.get("email_verified").toString()));
+        user.setProvider(provider);
+        user.setRole(extractUserRole(extractRoles(attributes)));
+        return userRepository.save(user);
     }
 
     private UserRole extractUserRole(Collection<GrantedAuthority> authorities) {

@@ -31,6 +31,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public Optional<UserDTO> findById(UUID id) {
+        log.info("Finding user with id {}", id);
         Optional<User> user = userRepository.findById(id);
         return user.map(u -> modelMapper.map(u, UserDTO.class));
     }
@@ -38,6 +39,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public Optional<UserDTO> findByUsername(String username) {
+        log.info("Finding user with username {}", username);
         Optional<User> user = userRepository.findByUsername(username);
         return user.map(u -> modelMapper.map(u, UserDTO.class));
     }
@@ -45,6 +47,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public Optional<UserDTO> findByEmail(String email) {
+        log.info("Finding user with email {}", email);
         Optional<User> user = userRepository.findByEmail(email);
         return user.map(u -> modelMapper.map(u, UserDTO.class));
     }
@@ -52,6 +55,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public Optional<UserDTO> findByUsernameOrEmail(String usernameOrEmail) {
+        log.info("Find user with username or email: {}", usernameOrEmail);
         Optional<User> user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
         return user.map(u -> modelMapper.map(u, UserDTO.class));
     }
@@ -59,6 +63,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDTO updateUser(UUID userId, UserUpdateDTO userDTO) {
+        log.info("Updating user with id {}", userId);
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
@@ -66,11 +71,13 @@ public class UserServiceImpl implements UserService {
             user.setPhoneNumber(userDTO.getPhoneNumber());
         }
         User savedUser = userRepository.save(user);
+        log.info("Updated user with id {}", userId);
         return modelMapper.map(savedUser, UserDTO.class);
     }
 
     @Override
     public UserDTO createUser(UserCreateDTO userDTO) {
+        log.info("Creating user {}", userDTO);
         if (userRepository.existsByUsername(userDTO.getUsername())) {
             throw new ResourceAlreadyExistsException("Username " + userDTO.getUsername() + " already exists");
         }
@@ -79,9 +86,9 @@ public class UserServiceImpl implements UserService {
         }
         User newUser = modelMapper.map(userDTO, User.class);
         newUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        // TODO check provider if local then this should be false
         newUser.setEmailVerified(true);
         User savedUser = userRepository.save(newUser);
+        log.info("Created user {}", savedUser);
         // TODO send verification email or handle it with another service
         // TODO handle other object creations
         return modelMapper.map(savedUser, UserDTO.class);
@@ -90,6 +97,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public Page<UserDTO> findAllUsersAdmin(Pageable pageable) {
+        log.info("Finding all users with role ADMIN");
         Page<User> users = userRepository.findAllByRole(UserRole.ADMIN, pageable);
         return users.map(u -> modelMapper.map(u, UserDTO.class));
     }
@@ -97,6 +105,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public Page<UserDTO> findAllUsers(Pageable pageable) {
+        log.info("Finding all users");
         Page<User> users = userRepository.findAll(pageable);
         return users.map(u -> modelMapper.map(u, UserDTO.class));
     }
@@ -104,6 +113,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deleteUser(UUID userId) {
+        log.info("Deleting user with id {}", userId);
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User " + userId + " not found"));
         // TODO clean other things (profile image, wishlist, ..)
         userRepository.delete(user);
@@ -112,12 +122,14 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public boolean existsUsername(String username) {
+        log.info("Checking if username {} exists", username);
         return userRepository.existsByUsername(username);
     }
 
     @Override
     @Transactional(readOnly = true)
     public boolean existsEmail(String email) {
+        log.info("Checking if email {} exists", email);
         return userRepository.existsByEmail(email);
     }
 }

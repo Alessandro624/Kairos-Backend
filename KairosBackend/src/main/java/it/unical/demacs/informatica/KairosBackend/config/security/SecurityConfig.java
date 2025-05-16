@@ -2,9 +2,14 @@ package it.unical.demacs.informatica.KairosBackend.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.unical.demacs.informatica.KairosBackend.config.filter.JwtAuthFilter;
+import it.unical.demacs.informatica.KairosBackend.config.filter.KeycloakJwtFilter;
+import it.unical.demacs.informatica.KairosBackend.config.handler.OAuth2AuthenticationHandler;
+import it.unical.demacs.informatica.KairosBackend.core.service.CustomOAuth2UserService;
 import it.unical.demacs.informatica.KairosBackend.dto.ServiceError;
+import it.unical.demacs.informatica.KairosBackend.utility.SecurityUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +18,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +25,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -31,8 +36,11 @@ import java.util.Date;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
+
+    private final KeycloakJwtFilter keycloakJwtFilter;
 
     private final CorsConfigurationSource corsConfigurationSource;
 
@@ -45,63 +53,97 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        log.info("Configuring security filter chain");
+
         return http
                 // CORS
-                .cors(c -> c.configurationSource(corsConfigurationSource))
+                .cors(c -> {
+                    log.debug("Configuring CORS with custom configuration source");
+                    c.configurationSource(corsConfigurationSource);
+                })
                 // CSFR DISABLE FOR STATELESS API
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> {
+                    log.debug("Disabling CSRF protection for stateless API");
+                    csrf.disable();
+                })
                 // STATELESS
-                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // EXCEPTION HANDLER
-                .exceptionHandling(e -> e
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.setHeader("WWW-Authenticate", "Basic realm=\"Access to /login authentication endpoint\"");
-                            response.setContentType("application/json");
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            ServiceError error = new ServiceError();
-                            error.setTimestamp(Date.from(Instant.now()));
-                            error.setMessage(authException.getMessage());
-                            error.setUrl(request.getRequestURI());
-                            ObjectMapper mapper = new ObjectMapper();
-                            response.getWriter().write(mapper.writeValueAsString(error));
-                        }))
+                .sessionManagement(s -> {
+                    log.debug("Setting session management policy to STATELESS");
+                    s.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                })// EXCEPTION HANDLER
+                .exceptionHandling(e -> {
+                    log.debug("Configuring custom authentication entry point");
+                    e.authenticationEntryPoint((request, response, authException) -> {
+                        log.warn("Authentication failure: {} for request URI: {}", authException.getMessage(), request.getRequestURI());
+                        response.setHeader("WWW-Authenticate", "Basic realm=\"Access to /login authentication endpoint\"");
+                        response.setContentType("application/json");
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        ServiceError error = new ServiceError();
+                        error.setTimestamp(Date.from(Instant.now()));
+                        error.setMessage(authException.getMessage());
+                        error.setUrl(request.getRequestURI());
+                        ObjectMapper mapper = new ObjectMapper();
+                        response.getWriter().write(mapper.writeValueAsString(error));
+                    });
+                })
                 // AUTHORIZATION TODO add other endpoints
-                .authorizeHttpRequests(a -> a
-                        .requestMatchers(HttpMethod.POST, "/v1/auth/login", "/v1/auth/register").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/v1/auth/oauth2/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/swagger.html", "/swagger-ui/**", "/api-docs.html", "/actuator/**").permitAll()
-                        .anyRequest().authenticated()
-                )
+                .authorizeHttpRequests(a -> {
+                    log.debug("Configuring HTTP authorization rules");
+                    a.requestMatchers(HttpMethod.POST, "/v1/auth/login", "/v1/auth/register").permitAll();
+                    log.debug("Permitting public access to POST /v1/auth/login, /v1/auth/register");
+
+                    a.requestMatchers(HttpMethod.GET, "/v1/auth/oauth2/**").permitAll();
+                    log.debug("Permitting public access to GET /v1/auth/oauth2/**");
+
+                    a.requestMatchers("/swagger.html", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/**").permitAll();
+                    log.debug("Permitting public access to Swagger and actuator endpoints");
+
+                    a.anyRequest().authenticated();
+                    log.debug("Requiring authentication for all other requests");
+                })
                 // JWT FILTER BEFORE LOGIN
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .oauth2Login(o -> o
-                        .authorizationEndpoint(a -> a.baseUri("/v1/auth/oauth2/authorize"))
-                        .redirectionEndpoint(r -> r.baseUri("/v1/auth/oauth2/callback/*"))
-                        .userInfoEndpoint(u -> u.userService(customOAuth2UserService))
-                        .successHandler(oAuth2AuthenticationHandler)
-                )
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt
-                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                        )
-                )
-                .logout(l -> l
-                        .logoutUrl("/v1/auth/logout")
-                        .logoutSuccessUrl("/v1/auth/logout/success")
-                        .clearAuthentication(true)
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
-                )
+                // OAUTH2 LOGIN HANDLING
+                .oauth2Login(o -> {
+                    log.debug("Configuring OAuth2 login handling");
+                    o.authorizationEndpoint(a -> a.baseUri("/v1/auth/oauth2/authorize"));
+                    o.redirectionEndpoint(r -> r.baseUri("/v1/auth/oauth2/callback/*"));
+                    o.userInfoEndpoint(u -> u.userService(customOAuth2UserService));
+                    o.successHandler(oAuth2AuthenticationHandler);
+                    o.failureUrl("/v1/auth/oauth2/login/failure");
+                    log.debug("OAuth2 login configured with custom user service and authentication handler");
+                })
+                // OAUTH2 RESOURCE SERVER FOR KEYCLOAK
+                .oauth2ResourceServer(oauth2 -> {
+                    log.debug("Configuring OAuth2 resource server for Keycloak");
+                    // EXCLUDING JWT DECODING BY ISSUER
+                    oauth2.bearerTokenResolver(request -> {
+                        String token = request.getHeader("Authorization");
+                        if (token != null && SecurityUtils.isKeycloakToken(token, issuerUri)) {
+                            log.debug("Found Keycloak token, bypassing standard JWT decoding");
+                            return token.startsWith("Bearer ") ? token.substring(7) : null;
+                        }
+                        log.debug("No token or non-Keycloak token found in request");
+                        return null;
+                    });
+                    oauth2.jwt(jwt -> {
+                        log.debug("Configuring JWT authentication converter");
+                        jwt.jwtAuthenticationConverter(jwtAuthenticationConverter());
+                    });
+                })
+                .addFilterAfter(keycloakJwtFilter, BearerTokenAuthenticationFilter.class)
                 .build();
     }
 
     @Bean
     public JwtDecoder jwtDecoder() {
+        log.info("Creating JWT decoder from issuer URI: {}", issuerUri);
         return JwtDecoders.fromIssuerLocation(issuerUri);
     }
 
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        log.debug("Creating JWT authentication converter");
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
 
         grantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
@@ -114,11 +156,13 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        log.info("Creating authentication manager");
         return configuration.getAuthenticationManager();
     }
 
     @Bean
     PasswordEncoder passwordEncoder() {
+        log.debug("Creating BCrypt password encoder");
         return new BCryptPasswordEncoder();
     }
 }

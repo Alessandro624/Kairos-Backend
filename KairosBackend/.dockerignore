@@ -1,7 +1,10 @@
 .idea
+keycloak_config
+postman
 *mvn*
 HELP.md
 *git*
 target/
 Dockerfile
 docker-compose.yml
+kairos-start*

@@ -16,14 +16,18 @@ services:
       timeout: 45s
       interval: 10s
       retries: 10
+    networks:
+      kairos-network:
 
   app:
     build: .
     container_name: kairos_app
     restart: on-failure
     depends_on:
-      - db
-      - keycloak
+      db:
+        condition: service_started
+      keycloak:
+        condition: service_started
     ports:
       - "8080:8080"  # HTTP
       - "8443:8443"  # HTTPS
@@ -38,8 +42,8 @@ services:
       GOOGLE_CLIENT_SECRET_KAIROS: ${GOOGLE_CLIENT_SECRET_KAIROS}
       KEYCLOAK_CLIENT_ID_KAIROS: ${KEYCLOAK_CLIENT_ID_KAIROS}
       KEYCLOAK_CLIENT_SECRET_KAIROS: ${KEYCLOAK_CLIENT_SECRET_KAIROS}
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8081/realms/kairos-realm
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8081/realms/kairos-realm/protocol/openid-connect/certs
+    networks:
+      kairos-network:
 
   keycloak_db:
     image: postgres:17-alpine
@@ -53,13 +57,16 @@ services:
       - "5435:5432"
     volumes:
       - keycloak_data:/var/lib/postgresql/data
+    networks:
+      kairos-network:
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     container_name: kairos_keycloak
     restart: unless-stopped
     depends_on:
-      - keycloak_db
+      keycloak_db:
+        condition: service_started
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://keycloak_db:5432/keycloak_db
@@ -68,12 +75,34 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
       KC_HTTP_PORT: 8081
+      KC_HOSTNAME: keycloak
+      KC_HOSTNAME_STRICT: "false"
     ports:
       - "8081:8081"
+    volumes:
+      - ./keycloak_config/realm-export.json:/opt/keycloak/data/import/realm-export.json
     command:
       - start-dev
       - --http-port=8081
+      - --import-realm
+    networks:
+      kairos-network:
+
+  keycloak-init:
+    image: alpine:latest
+    container_name: kairos_keycloak_init
+    depends_on:
+      keycloak:
+        condition: service_started
+    volumes:
+      - ./keycloak_config/init_users.sh:/scripts/init_users.sh
+    entrypoint: [ "sh", "-c", "apk add --no-cache curl jq && sh /scripts/init_users.sh" ]
+    networks:
+      kairos-network:
 
 volumes:
   db_data:
   keycloak_data:
+
+networks:
+  kairos-network:

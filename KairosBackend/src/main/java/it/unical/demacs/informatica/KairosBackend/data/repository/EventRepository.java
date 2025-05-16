@@ -27,7 +27,7 @@ public interface EventRepository extends JpaRepository<Event, UUID>, PagingAndSo
 
     @Query("SELECT e FROM Event e " +
             "WHERE e.structure.address.city = :city OR e.structure.address.zipCode = :zip " +
-            "AND e.isVisible = True AND e.dateTime >= :fromDate " +
+            "AND e.dateTime >= :fromDate " +
             "ORDER BY e.dateTime ASC")
     Page<Event> findEventsNearLocationStartingFrom(@Param("city") String city, @Param("zip") String zip,
                                                    @Param("fromDate") LocalDateTime now, Pageable pageable);

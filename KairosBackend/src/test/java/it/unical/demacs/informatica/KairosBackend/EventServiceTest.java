@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 
 import java.time.LocalDateTime;
@@ -25,7 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @SpringBootTest
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
 public class EventServiceTest {
 
     @Mock

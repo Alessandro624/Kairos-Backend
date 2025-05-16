@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import
 
 import java.util.Set;
 
@@ -24,6 +23,8 @@ public class StripeServiceImpl implements StripeService {
     private EventService eventService;
     private TicketService ticketService;
 
+
+    // https://docs.stripe.com/connect/collect-then-transfer-guide?lang=java&connect-account-creation-pattern=typeless
     public Charge createCharge(Set<Ticket> tickets) {
         // TODO: Implement!
         return null;

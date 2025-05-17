@@ -61,7 +61,6 @@ public class StructureServiceImpl implements StructureService
     }
 
     @Override
-    @Transactional(readOnly = true)
     public StructureDTO create(StructureCreateDTO dto)
     {
         Structure structure = modelMapper.map(dto, Structure.class);
@@ -71,7 +70,6 @@ public class StructureServiceImpl implements StructureService
     }
 
     @Override
-    @Transactional(readOnly = true)
     public void deleteById(UUID id)
     {
         if (!structureRepository.existsById(id))

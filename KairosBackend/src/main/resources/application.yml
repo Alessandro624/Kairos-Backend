@@ -1,0 +1,16 @@
+security:
+  enabled: true
+  public-endpoints:
+    - /v1/auth/login
+    - /v1/auth/register
+    - /v1/auth/oauth2/**
+    - /v3/api-docs/**
+    - /swagger.html
+    - /swagger-ui/**
+    - /swagger-ui.html
+    - /actuator/**
+  protected-routes:
+    /example/{idExample}: ROLE_ADMIN, ROLE_USER
+    /example/example: ROLE_USER
+    /example/POST: ROLE_ADMIN
+    /example/{idExample}/PUT: ROLE_ADMIN

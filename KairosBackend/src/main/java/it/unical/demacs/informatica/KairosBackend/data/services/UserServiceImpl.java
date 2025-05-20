@@ -79,6 +79,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
+    public void updateUserPassword(UUID userId, String oldPassword, String newPassword) {
+        log.info("Updating password for user with id {}", userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new ResourceNotFoundException("Old password is incorrect");
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        log.info("Updated password for user with id {}", userId);
+    }
+
+    @Override
+    public UserDTO makeUserAdmin(UUID userId) {
+        log.info("Making user with id {} an admin", userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
+        user.setRole(UserRole.ADMIN);
+        User savedUser = userRepository.save(user);
+        log.info("Made user with id {} an admin", userId);
+        return modelMapper.map(savedUser, UserDTO.class);
+    }
+
+    @Override
     public UserDTO createUser(UserCreateDTO userDTO) {
         log.info("Creating user {}", userDTO);
         if (userRepository.existsByUsername(userDTO.getUsername())) {

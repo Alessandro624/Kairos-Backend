@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public interface EventService {
     EventDTO getEventById(UUID id);
-    void saveEvent(EventCreateDTO event);
+    EventDTO saveEvent(EventCreateDTO event);
     void deleteEvent(UUID id);
     EventDTO updateEvent(UUID id, EventUpdateDTO eventUpdated);
 

@@ -20,6 +20,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class SecurityProperties {
     private boolean enabled = true;
+    private boolean emailVerification = true;
     private List<String> publicEndpoints = new ArrayList<>();
     private Map<String, String> protectedRoutes = new HashMap<>();
 }

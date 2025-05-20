@@ -1,5 +1,6 @@
 security:
   enabled: true
+  email-verification: true
   public-endpoints:
     - /v1/auth/login
     - /v1/auth/register
@@ -23,9 +24,9 @@ security:
 kairos:
   cleanup:
     email-verification:
-      delay: 15 * 60 * 100
+      delay: 900000
       initial-delay: 500
 
     user-cache:
-      delay: 10 * 60 * 100
+      delay: 600000
       initial-delay: 500

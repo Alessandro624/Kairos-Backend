@@ -39,6 +39,9 @@ public class UserServiceImpl implements UserService {
     @Value("${kairos.cleanup.email-verification.delay:900000}")
     private long userVerificationEmailExpiration;
 
+    @Value("${security.email-verification}")
+    private boolean emailVerificationEnabled;
+
     @Override
     @Transactional(readOnly = true)
     public Optional<UserDTO> findById(UUID id) {
@@ -123,7 +126,7 @@ public class UserServiceImpl implements UserService {
         }
         User newUser = modelMapper.map(userDTO, User.class);
         newUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        newUser.setEmailVerified(true);
+        newUser.setEmailVerified(!emailVerificationEnabled);
         User savedUser = userRepository.save(newUser);
         log.info("Created user {}", savedUser);
         // TODO send verification email or handle it with another service

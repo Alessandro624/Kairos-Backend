@@ -10,6 +10,11 @@ security:
     - /swagger-ui.html
     - /actuator/**
   protected-routes:
+    /v1/users: ROLE_ADMIN
+    /v1/users/admin: ROLE_ADMIN
+    /v1/users/{userId}/DELETE: ROLE_ADMIN
+    /v1/users/{userId}/make-admin: ROLE_ADMIN
+
     /example/{idExample}: ROLE_ADMIN, ROLE_USER
     /example/example: ROLE_USER
     /example/POST: ROLE_ADMIN

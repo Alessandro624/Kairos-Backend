@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,8 +24,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     boolean existsByEmail(String email);
 
-    // TODO it can be useful for a cleaning scheduler
-    Page<User> findAllByEmailVerifiedFalse(Pageable pageable);
+    List<User> findAllByEmailVerifiedFalseAndCreationDateBefore(LocalDateTime date);
 
     Page<User> findAllByRole(UserRole role, Pageable pageable);
 }

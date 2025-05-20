@@ -19,3 +19,13 @@ security:
     /example/example: ROLE_USER
     /example/POST: ROLE_ADMIN
     /example/{idExample}/PUT: ROLE_ADMIN
+
+kairos:
+  cleanup:
+    email-verification:
+      delay: 15 * 60 * 100
+      initial-delay: 500
+
+    user-cache:
+      delay: 10 * 60 * 100
+      initial-delay: 500

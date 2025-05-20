@@ -28,7 +28,7 @@ public class CacheConfig {
     }
 
     @CacheEvict(allEntries = true, value = {CACHE_FOR_USER})
-    @Scheduled(fixedDelay = 10 * 60 * 1000, initialDelay = 500)
+    @Scheduled(fixedDelayString = "${kairos.cleanup.user-cache.delay}", initialDelayString = "${kairos.cleanup.user-cache.initial-delay}")
     public void placeholderIdCacheEvict() {
         log.info("Flush Cache[{}] at [{}]", CACHE_FOR_USER, formatter.format(LocalDateTime.now()));
     }

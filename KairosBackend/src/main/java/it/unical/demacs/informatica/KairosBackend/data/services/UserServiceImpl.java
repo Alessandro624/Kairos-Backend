@@ -2,6 +2,7 @@ package it.unical.demacs.informatica.KairosBackend.data.services;
 
 import it.unical.demacs.informatica.KairosBackend.config.CacheConfig;
 import it.unical.demacs.informatica.KairosBackend.data.entities.User;
+import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Provider;
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.UserRole;
 import it.unical.demacs.informatica.KairosBackend.data.repository.UserRepository;
 import it.unical.demacs.informatica.KairosBackend.dto.user.UserCreateDTO;
@@ -12,14 +13,18 @@ import it.unical.demacs.informatica.KairosBackend.exception.ResourceNotFoundExce
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,6 +35,9 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${kairos.cleanup.email-verification.delay:900000}")
+    private long userVerificationEmailExpiration;
 
     @Override
     @Transactional(readOnly = true)
@@ -84,7 +92,10 @@ public class UserServiceImpl implements UserService {
         log.info("Updating password for user with id {}", userId);
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-            throw new ResourceNotFoundException("Old password is incorrect");
+            throw new IllegalArgumentException("Old password is incorrect");
+        }
+        if (user.getProvider() != Provider.LOCAL) {
+            throw new IllegalArgumentException("Only local users can update password");
         }
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
@@ -160,5 +171,23 @@ public class UserServiceImpl implements UserService {
     public boolean existsEmail(String email) {
         log.info("Checking if email {} exists", email);
         return userRepository.existsByEmail(email);
+    }
+
+    @Override
+    @Transactional
+    @Scheduled(fixedDelayString = "${kairos.cleanup.email-verification.delay}", initialDelayString = "${kairos.cleanup.email-verification.initial-delay}")
+    public void cleanUpUnverifiedUsers() {
+        log.info("Starting cleanup of unverified user accounts");
+
+        LocalDateTime cutoffTime = LocalDateTime.now().minusMinutes(userVerificationEmailExpiration);
+        List<User> unverifiedUsers = userRepository.findAllByEmailVerifiedFalseAndCreationDateBefore(cutoffTime);
+
+        if (!unverifiedUsers.isEmpty()) {
+            log.info("Found {} unverified user accounts to delete", unverifiedUsers.size());
+            userRepository.deleteAll(unverifiedUsers);
+            log.info("Successfully deleted {} unverified user accounts", unverifiedUsers.size());
+        } else {
+            log.info("No unverified user accounts to delete");
+        }
     }
 }

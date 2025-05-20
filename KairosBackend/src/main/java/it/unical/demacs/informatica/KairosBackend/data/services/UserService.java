@@ -35,4 +35,6 @@ public interface UserService {
     boolean existsUsername(String username);
 
     boolean existsEmail(String email);
+
+    void cleanUpUnverifiedUsers();
 }

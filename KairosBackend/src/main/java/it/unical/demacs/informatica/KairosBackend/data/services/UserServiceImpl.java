@@ -1,5 +1,6 @@
 package it.unical.demacs.informatica.KairosBackend.data.services;
 
+import it.unical.demacs.informatica.KairosBackend.config.CacheConfig;
 import it.unical.demacs.informatica.KairosBackend.data.entities.User;
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.UserRole;
 import it.unical.demacs.informatica.KairosBackend.data.repository.UserRepository;
@@ -11,6 +12,8 @@ import it.unical.demacs.informatica.KairosBackend.exception.ResourceNotFoundExce
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -96,6 +99,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = CacheConfig.CACHE_FOR_USER, key = "#pageable")
     public Page<UserDTO> findAllUsersAdmin(Pageable pageable) {
         log.info("Finding all users with role ADMIN");
         Page<User> users = userRepository.findAllByRole(UserRole.ADMIN, pageable);
@@ -104,6 +108,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = CacheConfig.CACHE_FOR_USER, key = "#pageable")
     public Page<UserDTO> findAllUsers(Pageable pageable) {
         log.info("Finding all users");
         Page<User> users = userRepository.findAll(pageable);
@@ -112,6 +117,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @CacheEvict(value = CacheConfig.CACHE_FOR_USER, allEntries = true)
     public void deleteUser(UUID userId) {
         log.info("Deleting user with id {}", userId);
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User " + userId + " not found"));

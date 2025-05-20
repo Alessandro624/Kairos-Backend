@@ -73,10 +73,10 @@ public class WishlistServiceImpl implements WishlistService {
     //maybe not used for manyToMany columns.
     @Override
     @Transactional
-    public WishlistDTO updateWishlist(WishlistUpdateDTO wishlistUpdateDTO, UUID creatorId) {
-        Wishlist wishlist = wishlistRepository.findById(wishlistUpdateDTO.getId()).orElseThrow(() -> new ResourceNotFoundException("Wishlist " + wishlistUpdateDTO.getId() + " doesn't exist"));
+    public WishlistDTO updateWishlist(UUID wishlistId, WishlistUpdateDTO wishlistUpdateDTO) {
+        Wishlist wishlist = wishlistRepository.findById(wishlistId).orElseThrow(() -> new ResourceNotFoundException("Wishlist " + wishlistUpdateDTO.getId() + " doesn't exist"));
 
-        if(wishlistRepository.existsByCreator_IdAndName(creatorId, wishlistUpdateDTO.getName()))
+        if(wishlistRepository.existsByCreator_IdAndName(wishlist.getCreator().getId(), wishlistUpdateDTO.getName()))
             //TODO frontend should do a check (maybe a warning)
             wishlist.setName(wishlistUpdateDTO.getName()+"1");
         else
@@ -119,6 +119,7 @@ public class WishlistServiceImpl implements WishlistService {
 
         return modelMapper.map(saved, WishlistDTO.class);
     }
+
 
     @Override
     public void removeUserFromWishlist(UUID wishlistId, UUID userId) {

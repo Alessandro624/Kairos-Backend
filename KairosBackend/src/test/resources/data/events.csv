@@ -1,0 +1,4 @@
+title;description;category;dateTime;maxParticipants;isVisible
+Concerto Rock;Evento musicale con band locali;MUSIC;2025-07-15T21:00:00;500;true
+Mostra d'Arte;Esposizione di artisti emergenti;ART;2025-06-20T10:00:00;200;true
+Hackathon 2025;Competizione di coding di 24 ore;TECH;2025-09-05T09:00:00;100;false

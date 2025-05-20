@@ -1,4 +1,4 @@
-package it.unical.demacs.informatica.KairosBackend.config.security;
+package it.unical.demacs.informatica.KairosBackend.core.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

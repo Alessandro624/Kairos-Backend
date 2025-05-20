@@ -752,7 +752,7 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "secret": "**********",
+      "secret": "__CLIENT_SECRET__",
       "redirectUris": [
         "https://www.getpostman.com/oauth2/callback",
         "http://localhost:8080/*",

@@ -18,6 +18,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -51,9 +52,21 @@ public class SecurityConfig {
     @Value("${spring.security.oauth2.client.provider.keycloak.issuer-uri}")
     private String issuerUri;
 
+    private final SecurityProperties securityProperties;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         log.info("Configuring security filter chain");
+
+        if (!securityProperties.isEnabled()) {
+            log.warn("Security is disabled: testing purpose only");
+            return http
+                    .cors(c -> c.configurationSource(corsConfigurationSource))
+                    .csrf(AbstractHttpConfigurer::disable)
+                    .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                    .authorizeHttpRequests(a -> a.anyRequest().permitAll())
+                    .build();
+        }
 
         return http
                 // CORS
@@ -86,18 +99,32 @@ public class SecurityConfig {
                         response.getWriter().write(mapper.writeValueAsString(error));
                     });
                 })
-                // AUTHORIZATION TODO add other endpoints
+                // AUTHORIZATION
                 .authorizeHttpRequests(a -> {
                     log.debug("Configuring HTTP authorization rules");
-                    a.requestMatchers(HttpMethod.POST, "/v1/auth/login", "/v1/auth/register").permitAll();
-                    log.debug("Permitting public access to POST /v1/auth/login, /v1/auth/register");
-
-                    a.requestMatchers(HttpMethod.GET, "/v1/auth/oauth2/**").permitAll();
-                    log.debug("Permitting public access to GET /v1/auth/oauth2/**");
-
-                    a.requestMatchers("/swagger.html", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/**").permitAll();
-                    log.debug("Permitting public access to Swagger and actuator endpoints");
-
+                    for (String path : securityProperties.getPublicEndpoints()) {
+                        a.requestMatchers(path).permitAll();
+                        log.debug("Permitting public access to {}", path);
+                    }
+                    securityProperties.getProtectedRoutes().forEach((path, roles) -> {
+                        String[] roleArray = roles.split(",\\s*");
+                        if (path.contains("/POST")) {
+                            String actualPath = path.replace("/POST", "");
+                            a.requestMatchers(HttpMethod.POST, actualPath).hasAnyAuthority(roleArray);
+                            log.debug("Protecting POST {} with roles {}", actualPath, roles);
+                        } else if (path.contains("/PUT")) {
+                            String actualPath = path.replace("/PUT", "");
+                            a.requestMatchers(HttpMethod.PUT, actualPath).hasAnyAuthority(roleArray);
+                            log.debug("Protecting PUT {} with roles {}", actualPath, roles);
+                        } else if (path.contains("/DELETE")) {
+                            String actualPath = path.replace("/DELETE", "");
+                            a.requestMatchers(HttpMethod.DELETE, actualPath).hasAnyAuthority(roleArray);
+                            log.debug("Protecting DELETE {} with roles {}", actualPath, roles);
+                        } else {
+                            a.requestMatchers(path).hasAnyAuthority(roleArray);
+                            log.debug("Protecting {} with roles {}", path, roles);
+                        }
+                    });
                     a.anyRequest().authenticated();
                     log.debug("Requiring authentication for all other requests");
                 })

@@ -1,3 +1,5 @@
+@echo off
+
 REM =====================================
 REM kairos-start.bat - Windows script for Kairos environment
 REM =====================================

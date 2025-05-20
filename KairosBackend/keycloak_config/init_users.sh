@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 KEYCLOAK_URL="http://keycloak:8081"
 REALM="kairos-realm"
 ADMIN_USER="admin" 

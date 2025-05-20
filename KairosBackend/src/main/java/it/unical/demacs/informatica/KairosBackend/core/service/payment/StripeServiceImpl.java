@@ -1,10 +1,6 @@
-package it.unical.demacs.informatica.KairosBackend.core.service;
+package it.unical.demacs.informatica.KairosBackend.core.service.payment;
 
 import com.stripe.model.Charge;
-import com.stripe.model.Customer;
-import com.stripe.model.Product;
-import com.stripe.param.ChargeCreateParams;
-import com.stripe.param.checkout.SessionCreateParams;
 import it.unical.demacs.informatica.KairosBackend.data.entities.Ticket;
 import it.unical.demacs.informatica.KairosBackend.data.services.EventService;
 import it.unical.demacs.informatica.KairosBackend.data.services.TicketService;

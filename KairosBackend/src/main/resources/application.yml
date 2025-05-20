@@ -24,6 +24,7 @@ security:
 kairos:
   cleanup:
     email-verification:
+      minutes: 15
       delay: 900000
       initial-delay: 500
 

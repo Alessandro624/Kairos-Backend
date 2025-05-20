@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${kairos.cleanup.email-verification.delay:900000}")
+    @Value("${kairos.cleanup.email-verification.minutes:15}")
     private long userVerificationEmailExpiration;
 
     @Value("${security.email-verification}")

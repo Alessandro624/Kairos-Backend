@@ -298,6 +298,27 @@ public class UserServiceTest {
     }
 
     @Test
+    public void testUpdateUserPassword() {
+        assertNotNull(testUserId, "Test user ID should not be null");
+        String oldPassword = "password123";
+        String newPassword = "newPassword123";
+
+        userService.updateUserPassword(testUserId, oldPassword, newPassword);
+
+        assertTrue(userService.findById(testUserId).isPresent(), "User should still exist after password update");
+    }
+
+    @Test
+    public void testMakeUserAdmin() {
+        assertNotNull(testUserId, "Test user ID should not be null");
+
+        UserDTO updatedUser = userService.makeUserAdmin(testUserId);
+
+        assertEquals(UserRole.ADMIN, updatedUser.getRole(), "User role should be updated to ADMIN");
+        assertEquals(testUserId, updatedUser.getId(), "User ID should remain the same");
+    }
+
+    @Test
     public void testNonExistingId() {
         UUID nonExistingId = UUID.randomUUID();
 

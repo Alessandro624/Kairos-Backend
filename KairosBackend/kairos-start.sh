@@ -109,8 +109,6 @@ if docker compose up --build -d; then
 else
     echo "ERROR: Unable to start Docker containers!"
     cleanup
-    # shellcheck disable=SC2317
-    exit 1
 fi
 
 #============================================

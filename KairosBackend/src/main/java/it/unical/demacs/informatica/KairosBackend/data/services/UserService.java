@@ -20,11 +20,9 @@ public interface UserService {
 
     UserDTO updateUser(UUID userId, UserUpdateDTO userDTO);
 
-    // TODO update password maybe with another DTO (oldPass, newPass, confPass), using a token based mechanism?
+    void updateUserPassword(UUID userId, String oldPassword, String newPassword);
 
-    // TODO token based mechanism for email verification
-
-    // TODO authentication using a UserAuthDTO with usernameOrEmail and a password field ?
+    UserDTO makeUserAdmin(UUID userId);
 
     UserDTO createUser(UserCreateDTO userDTO);
 
@@ -37,4 +35,6 @@ public interface UserService {
     boolean existsUsername(String username);
 
     boolean existsEmail(String email);
+
+    void cleanUpUnverifiedUsers();
 }

@@ -87,15 +87,17 @@ public class JwtService {
         return "auth".equals(tokenType) && (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isTokenValid(String token, String type) {
         try {
             extractAllClaims(token);
-            return type.equals(extractTokenType(token));
+            return type.equals(extractTokenType(token)) && !isTokenExpired(token);
         } catch (Exception e) {
             return false;
         }
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }

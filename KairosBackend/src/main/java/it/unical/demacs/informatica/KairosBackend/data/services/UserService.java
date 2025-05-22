@@ -22,6 +22,8 @@ public interface UserService {
 
     void updateUserPassword(UUID userId, String oldPassword, String newPassword);
 
+    void activateUser(String username);
+
     UserDTO makeUserAdmin(UUID userId);
 
     UserDTO createUser(UserCreateDTO userDTO);

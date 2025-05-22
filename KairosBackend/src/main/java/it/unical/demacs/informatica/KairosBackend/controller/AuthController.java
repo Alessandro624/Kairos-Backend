@@ -1,6 +1,7 @@
 package it.unical.demacs.informatica.KairosBackend.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -81,7 +82,7 @@ public class AuthController {
             @RequestBody String refreshToken
     ) {
         log.debug("Processing token refresh request");
-        if (!jwtService.isTokenValid(refreshToken)) {
+        if (!jwtService.isTokenValid(refreshToken, "refresh")) {
             log.warn("Invalid refresh token provided");
             return ResponseEntity.badRequest().build();
         }
@@ -113,6 +114,36 @@ public class AuthController {
         userCreateDTO.setRole(UserRole.USER);
         userService.createUser(userCreateDTO);
         log.info("User registration successful for username: {}", userCreateDTO.getUsername());
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "Confirm user email",
+            description = "Confirms a user's email address using a verification token sent to their email.",
+            parameters = {
+                    @Parameter(name = "token", description = "The email verification token", required = true,
+                            schema = @Schema(type = "string"))
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Email successfully verified"),
+                    @ApiResponse(responseCode = "400", description = "Invalid verification link",
+                            content = @Content(schema = @Schema(implementation = ServiceError.class))),
+                    @ApiResponse(responseCode = "404", description = "User not found",
+                            content = @Content(schema = @Schema(implementation = ServiceError.class)))
+            }
+    )
+    @GetMapping("/confirm")
+    public ResponseEntity<?> confirmEmail(@Parameter(hidden = true) @RequestParam String token) {
+        log.debug("Processing email confirmation with token: {}", token);
+
+        if (!jwtService.isTokenValid(token, "email-verification")) {
+            log.warn("Email verification token is invalid or expired: {}", token);
+            return ResponseEntity.badRequest().body("Invalid verification link.");
+        }
+
+        String username = jwtService.extractUsername(token);
+        userService.activateUser(username);
+        log.info("Email verification successful for user: {}", username);
         return ResponseEntity.ok().build();
     }
 

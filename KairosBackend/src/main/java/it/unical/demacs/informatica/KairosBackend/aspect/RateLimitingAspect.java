@@ -20,7 +20,6 @@ public class RateLimitingAspect {
 
     @Pointcut("@within(controller)")
     public void restControllerMethods(RestController controller) {
-        log.debug("RestController methods called");
     }
 
     @Before(value = "restControllerMethods(controller)", argNames = "joinPoint,controller")

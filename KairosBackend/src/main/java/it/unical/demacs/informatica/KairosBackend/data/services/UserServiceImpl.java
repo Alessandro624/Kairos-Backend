@@ -106,6 +106,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
+    public void activateUser(String username) {
+        log.info("Activating user with username {}", username);
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User with username " + username + " not found"));
+        if (!user.isEmailVerified()) {
+            user.setEmailVerified(true);
+            User savedUser = userRepository.save(user);
+            log.info("Activated user with username {}", savedUser.getUsername());
+        } else {
+            log.info("User with username {} already activated", username);
+        }
+    }
+
+    @Override
     public UserDTO makeUserAdmin(UUID userId) {
         log.info("Making user with id {} an admin", userId);
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
@@ -129,8 +143,6 @@ public class UserServiceImpl implements UserService {
         newUser.setEmailVerified(!emailVerificationEnabled);
         User savedUser = userRepository.save(newUser);
         log.info("Created user {}", savedUser);
-        // TODO send verification email or handle it with another service
-        // TODO handle other object creations
         return modelMapper.map(savedUser, UserDTO.class);
     }
 
@@ -158,7 +170,6 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(UUID userId) {
         log.info("Deleting user with id {}", userId);
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User " + userId + " not found"));
-        // TODO clean other things (profile image, wishlist, ..)
         userRepository.delete(user);
     }
 

@@ -12,6 +12,8 @@
 # export GOOGLE_CLIENT_SECRET_KAIROS="your-google-client-secret"
 # export KEYCLOAK_CLIENT_ID_KAIROS="your-keycloak-client-id"
 # export KEYCLOAK_CLIENT_SECRET_KAIROS="your-keycloak-client-secret"
+# export SPRING_MAIL_USERNAME_KAIROS="your-spring-mail-username"
+# export SPRING_MAIL_PASSWORD_KAIROS="your-spring-mail-password"
 
 #============================================
 # HELPER FUNCTIONS

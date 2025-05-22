@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmez votre adresse e-mail</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+        }
+
+        .header {
+            background-color: #4F46E5; /* Indigo 600 */
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+
+        .content {
+            padding: 30px;
+            color: #333333;
+            line-height: 1.6;
+        }
+
+        .content p {
+            margin-bottom: 15px;
+        }
+
+        .button-container {
+            text-align: center;
+            padding: 20px 30px;
+            background-color: #f9f9f9;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #4F46E5; /* Indigo 600 */
+            color: #ffffff;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #4338CA; /* Indigo 700 */
+        }
+
+        .footer {
+            background-color: #f0f0f0;
+            color: #777777;
+            padding: 20px;
+            text-align: center;
+            font-size: 0.85em;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        a {
+            color: #4F46E5;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h2>Confirmez votre adresse e-mail</h2>
+    </div>
+    <div class="content">
+        <p>Bonjour <strong th:text="${username}">Utilisateur</strong>,</p>
+        <p>Merci de vous être inscrit à notre service. Pour compléter votre inscription et activer votre compte,
+            veuillez confirmer votre adresse e-mail en cliquant sur le bouton ci-dessous :</p>
+        <div class="button-container" style="background-color: #ffffff; padding: 0; text-align: center;">
+            <a th:href="${confirmationLink}" class="button">Confirmer l'e-mail</a>
+        </div>
+        <p>Si le bouton ci-dessus ne fonctionne pas, veuillez copier et coller le lien suivant dans votre navigateur web
+            :</p>
+        <p><a th:href="${confirmationLink}" th:text="${confirmationLink}">Lien de confirmation</a></p>
+        <p>Si vous ne vous êtes pas inscrit à ce service, veuillez ignorer cet e-mail.</p>
+        <p>Cordialement,</p>
+        <p>L'équipe Kairos</p>
+    </div>
+    <div class="footer">
+        <p>&copy; 2025 Kairos. Tous droits réservés.</p>
+    </div>
+</div>
+</body>
+</html>

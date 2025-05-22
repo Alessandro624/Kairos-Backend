@@ -3,6 +3,7 @@ package it.unical.demacs.informatica.KairosBackend.config.handler;
 import io.swagger.v3.oas.annotations.Hidden;
 import it.unical.demacs.informatica.KairosBackend.config.i18n.MessageReader;
 import it.unical.demacs.informatica.KairosBackend.dto.ServiceError;
+import it.unical.demacs.informatica.KairosBackend.exception.RateLimitExceededException;
 import it.unical.demacs.informatica.KairosBackend.exception.ResourceAlreadyExistsException;
 import it.unical.demacs.informatica.KairosBackend.exception.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -118,6 +119,14 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ServiceError onResourceAlreadyExistsException(WebRequest req, ResourceAlreadyExistsException ex) {
         log.info(messageReader.getMessage("exceptions.resource_already_exists", ex.getMessage()));
+        return errorResponse(req, ex.getMessage());
+    }
+
+    @ExceptionHandler(RateLimitExceededException.class)
+    @Hidden
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    public ServiceError onRateLimitExceededException(WebRequest req, RateLimitExceededException ex) {
+        log.info(messageReader.getMessage("exceptions.rate_limit_exceeded", ex.getMessage()));
         return errorResponse(req, ex.getMessage());
     }
 

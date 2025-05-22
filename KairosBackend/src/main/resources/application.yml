@@ -31,3 +31,6 @@ kairos:
     user-cache:
       delay: 600000
       initial-delay: 500
+
+  rate-limiter:
+    permits-per-second: 10

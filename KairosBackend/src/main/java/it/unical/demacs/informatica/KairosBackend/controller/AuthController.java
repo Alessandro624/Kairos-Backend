@@ -1,9 +1,15 @@
 package it.unical.demacs.informatica.KairosBackend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import it.unical.demacs.informatica.KairosBackend.core.service.JwtService;
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Provider;
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.UserRole;
 import it.unical.demacs.informatica.KairosBackend.data.services.UserService;
+import it.unical.demacs.informatica.KairosBackend.dto.ServiceError;
 import it.unical.demacs.informatica.KairosBackend.dto.auth.AuthRequest;
 import it.unical.demacs.informatica.KairosBackend.dto.auth.AuthResponse;
 import it.unical.demacs.informatica.KairosBackend.dto.user.UserCreateDTO;
@@ -22,14 +28,31 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = "/v1/auth", produces = "application/json")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Authentication", description = "Operations related to authentication")
 public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
     private final UserService userService;
 
+    @Operation(
+            summary = "Login user",
+            description = "Authenticates a user and returns JWT and refresh tokens.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully authenticated",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))),
+                    @ApiResponse(responseCode = "400", description = "Invalid credentials",
+                            content = @Content(schema = @Schema(implementation = ServiceError.class))),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized",
+                            content = @Content(schema = @Schema()))
+            }
+    )
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody @Valid AuthRequest authRequest) {
+    public ResponseEntity<AuthResponse> login(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Authentication request", required = true,
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthRequest.class)))
+            @Valid @RequestBody AuthRequest authRequest
+    ) {
         log.debug("Processing login request for user: {}", authRequest.getUsernameOrEmail());
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsernameOrEmail(), authRequest.getPassword()));
         log.debug("Authentication successful for user: {}", authRequest.getUsernameOrEmail());
@@ -41,8 +64,22 @@ public class AuthController {
         return ResponseEntity.ok(new AuthResponse(token, refreshToken));
     }
 
+    @Operation(
+            summary = "Refresh JWT token",
+            description = "Refreshes the JWT token using a valid refresh token.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully refreshed token",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))),
+                    @ApiResponse(responseCode = "400", description = "Invalid refresh token",
+                            content = @Content(schema = @Schema(implementation = ServiceError.class)))
+            }
+    )
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refresh(@RequestBody String refreshToken) {
+    public ResponseEntity<AuthResponse> refresh(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Refresh token", required = true,
+                    content = @Content(mediaType = "text/plain", schema = @Schema(type = "string")))
+            @RequestBody String refreshToken
+    ) {
         log.debug("Processing token refresh request");
         if (!jwtService.isTokenValid(refreshToken)) {
             log.warn("Invalid refresh token provided");
@@ -56,8 +93,21 @@ public class AuthController {
         return ResponseEntity.ok(new AuthResponse(newToken, refreshToken));
     }
 
+    @Operation(
+            summary = "Register new user",
+            description = "Registers a new user account.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully registered"),
+                    @ApiResponse(responseCode = "400", description = "Invalid input",
+                            content = @Content(schema = @Schema(implementation = ServiceError.class)))
+            }
+    )
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody @Valid UserCreateDTO userCreateDTO) {
+    public ResponseEntity<?> register(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "User registration details", required = true,
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserCreateDTO.class)))
+            @Valid @RequestBody UserCreateDTO userCreateDTO
+    ) {
         log.debug("Processing registration request for username: {}", userCreateDTO.getUsername());
         userCreateDTO.setProvider(Provider.LOCAL);
         userCreateDTO.setRole(UserRole.USER);
@@ -66,12 +116,28 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(
+            summary = "Logout success message",
+            description = "Endpoint to indicate successful logout.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Logout successful",
+                            content = @Content(mediaType = "text/plain", schema = @Schema(type = "string")))
+            }
+    )
     @GetMapping("/logout/success")
     public ResponseEntity<String> logoutSuccess() {
         log.info("User logged out successfully");
         return ResponseEntity.ok("Logout successful");
     }
 
+    @Operation(
+            summary = "OAuth2 login failure message",
+            description = "Endpoint to indicate a failed OAuth2 login attempt.",
+            responses = {
+                    @ApiResponse(responseCode = "400", description = "OAuth2 login failed",
+                            content = @Content(mediaType = "text/plain", schema = @Schema(type = "string")))
+            }
+    )
     @GetMapping("/oauth2/login/failure")
     public ResponseEntity<String> oAuth2LoginFailure() {
         log.warn("OAuth2 login attempt failed");

@@ -180,6 +180,26 @@ public class UserController {
     }
 
     @Operation(
+            summary = "Make a user an organizer",
+            description = "Elevates a specific user's role to ORGANIZER. Requires ADMIN role.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully made the user an organizer",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized",
+                            content = @Content(schema = @Schema())),
+                    @ApiResponse(responseCode = "403", description = "Forbidden - Requires ORGANIZER role",
+                            content = @Content(schema = @Schema())),
+                    @ApiResponse(responseCode = "404", description = "User not found",
+                            content = @Content(schema = @Schema(implementation = ServiceError.class)))
+            }
+    )
+    @PutMapping("/{userId}/make-organizer")
+    public ResponseEntity<UserDTO> makeUserOrganizer(@Parameter(description = "ID of the user to make organizer") @PathVariable UUID userId) {
+        log.info("Making user with id {} an organizer", userId);
+        return ResponseEntity.ok(userService.makeUserOrganizer(userId));
+    }
+
+    @Operation(
             summary = "Get current user's information",
             description = "Retrieves the information of the currently authenticated user.",
             responses = {

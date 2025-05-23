@@ -181,7 +181,71 @@
 			"response": []
 		},
 		{
+			"name": "Make Organizer",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/v1/users/{{userId}}/make-organizer",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"users",
+						"{{userId}}",
+						"make-organizer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Make Admin Https",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8443/v1/users/{{userId}}/make-admin",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"v1",
+						"users",
+						"{{userId}}",
+						"make-admin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Make Organizer Https",
 			"request": {
 				"auth": {
 					"type": "bearer",

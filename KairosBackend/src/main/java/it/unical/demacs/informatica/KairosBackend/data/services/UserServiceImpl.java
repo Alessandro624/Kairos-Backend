@@ -163,6 +163,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDTO makeUserOrganizer(UUID userId) {
+        log.info("Making user with id {} an organizer", userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(
+                messageReader.getMessage("user.notfound.id", userId.toString())
+        ));
+        user.setRole(UserRole.ORGANIZER);
+        User savedUser = userRepository.save(user);
+        log.info("Made user with id {} an organizer", userId);
+        return modelMapper.map(savedUser, UserDTO.class);
+    }
+
+    @Override
     public UserDTO createUser(UserCreateDTO userDTO) {
         log.info("Creating user {}", userDTO);
         if (userRepository.existsByUsername(userDTO.getUsername())) {

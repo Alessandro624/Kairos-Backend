@@ -28,6 +28,8 @@ public interface UserService {
 
     UserDTO makeUserAdmin(UUID userId);
 
+    UserDTO makeUserOrganizer(UUID userId);
+
     UserDTO createUser(UserCreateDTO userDTO);
 
     Page<UserDTO> findAllUsersAdmin(Pageable pageable);

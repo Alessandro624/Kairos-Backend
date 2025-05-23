@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import it.unical.demacs.informatica.KairosBackend.config.i18n.MessageReader;
 import it.unical.demacs.informatica.KairosBackend.core.service.EmailService;
 import it.unical.demacs.informatica.KairosBackend.core.service.JwtService;
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Provider;
@@ -40,6 +41,7 @@ public class AuthController {
     private final UserDetailsService userDetailsService;
     private final UserService userService;
     private final EmailService emailService;
+    private final MessageReader messageReader;
 
     @Operation(
             summary = "Login user",
@@ -81,7 +83,7 @@ public class AuthController {
             }
     )
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refresh(
+    public ResponseEntity<?> refresh(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Refresh token", required = true,
                     content = @Content(mediaType = "text/plain", schema = @Schema(type = "string")))
             @RequestBody String refreshToken
@@ -89,7 +91,7 @@ public class AuthController {
         log.debug("Processing token refresh request");
         if (!jwtService.isTokenValid(refreshToken, "refresh")) {
             log.warn("Invalid refresh token provided");
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(messageReader.getMessage("auth.refresh.invalid_token"));
         }
         String username = jwtService.extractUsername(refreshToken);
         log.debug("Refresh token valid for user: {}", username);
@@ -179,7 +181,7 @@ public class AuthController {
 
         if (!jwtService.isTokenValid(request.getToken(), "reset-password")) {
             log.warn("Invalid or expired password reset token: {}", request.getToken());
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(messageReader.getMessage("auth.reset_password.invalid_token"));
         }
 
         String username = jwtService.extractUsername(request.getToken());
@@ -211,7 +213,7 @@ public class AuthController {
 
         if (!jwtService.isTokenValid(token, "email-verification")) {
             log.warn("Email verification token is invalid or expired: {}", token);
-            return ResponseEntity.badRequest().body("Invalid verification link.");
+            return ResponseEntity.badRequest().body(messageReader.getMessage("auth.confirm_email.invalid_link"));
         }
 
         String username = jwtService.extractUsername(token);
@@ -231,6 +233,6 @@ public class AuthController {
     @GetMapping("/oauth2/login/failure")
     public ResponseEntity<String> oAuth2LoginFailure() {
         log.warn("OAuth2 login attempt failed");
-        return ResponseEntity.badRequest().body("Login with OAuth2 failed");
+        return ResponseEntity.badRequest().body(messageReader.getMessage("auth.oauth2.login_failed"));
     }
 }

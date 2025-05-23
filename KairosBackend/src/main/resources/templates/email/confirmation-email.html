@@ -25,7 +25,7 @@
         }
 
         .header {
-            background-color: #4F46E5;
+            background-color: #4F46E5; /* Indigo 600 */
             color: #ffffff;
             padding: 20px;
             text-align: center;
@@ -50,10 +50,14 @@
             border-top: 1px solid #e0e0e0;
         }
 
+        .button-container a {
+            color: #ffffff !important;
+        }
+
         .button {
             display: inline-block;
             background-color: #4F46E5; /* Indigo 600 */
-            color: #ffffff;
+            color: #ffffff !important;
             padding: 12px 25px;
             text-decoration: none;
             border-radius: 8px;
@@ -94,7 +98,7 @@
         <p>Hello <strong th:text="${username}">User</strong>,</p>
         <p>Thank you for registering with our service. To complete your registration and activate your account, please
             confirm your email address by clicking the button below:</p>
-        <div class="button-container" style="background-color: #ffffff; padding: 0; text-align: center;">
+        <div class="button-container">
             <a th:href="${confirmationLink}" class="button">Confirm Email</a>
         </div>
         <p>If the button above does not work, please copy and paste the following link into your web browser:</p>

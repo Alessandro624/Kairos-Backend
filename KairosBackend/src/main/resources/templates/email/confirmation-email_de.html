@@ -50,10 +50,14 @@
             border-top: 1px solid #e0e0e0;
         }
 
+        .button-container a {
+            color: #ffffff !important;
+        }
+
         .button {
             display: inline-block;
             background-color: #4F46E5; /* Indigo 600 */
-            color: #ffffff;
+            color: #ffffff !important;
             padding: 12px 25px;
             text-decoration: none;
             border-radius: 8px;
@@ -94,7 +98,7 @@
         <p>Hallo <strong th:text="${username}">Benutzer</strong>,</p>
         <p>Vielen Dank für Ihre Registrierung bei unserem Dienst. Um Ihre Registrierung abzuschließen und Ihr Konto zu
             aktivieren, bestätigen Sie bitte Ihre E-Mail-Adresse, indem Sie auf die Schaltfläche unten klicken:</p>
-        <div class="button-container" style="background-color: #ffffff; padding: 0; text-align: center;">
+        <div class="button-container">
             <a th:href="${confirmationLink}" class="button">E-Mail bestätigen</a>
         </div>
         <p>Wenn die obige Schaltfläche nicht funktioniert, kopieren Sie bitte den folgenden Link und fügen Sie ihn in

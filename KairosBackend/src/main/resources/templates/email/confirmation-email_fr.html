@@ -50,10 +50,14 @@
             border-top: 1px solid #e0e0e0;
         }
 
+        .button-container a {
+            color: #ffffff !important;
+        }
+
         .button {
             display: inline-block;
             background-color: #4F46E5; /* Indigo 600 */
-            color: #ffffff;
+            color: #ffffff !important;
             padding: 12px 25px;
             text-decoration: none;
             border-radius: 8px;
@@ -94,7 +98,7 @@
         <p>Bonjour <strong th:text="${username}">Utilisateur</strong>,</p>
         <p>Merci de vous être inscrit à notre service. Pour compléter votre inscription et activer votre compte,
             veuillez confirmer votre adresse e-mail en cliquant sur le bouton ci-dessous :</p>
-        <div class="button-container" style="background-color: #ffffff; padding: 0; text-align: center;">
+        <div class="button-container">
             <a th:href="${confirmationLink}" class="button">Confirmer l'e-mail</a>
         </div>
         <p>Si le bouton ci-dessus ne fonctionne pas, veuillez copier et coller le lien suivant dans votre navigateur web

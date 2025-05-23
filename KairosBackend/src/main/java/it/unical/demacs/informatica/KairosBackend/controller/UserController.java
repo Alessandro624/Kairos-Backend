@@ -11,6 +11,7 @@ import it.unical.demacs.informatica.KairosBackend.core.service.AuthService;
 import it.unical.demacs.informatica.KairosBackend.data.services.UserService;
 import it.unical.demacs.informatica.KairosBackend.dto.ServiceError;
 import it.unical.demacs.informatica.KairosBackend.dto.user.UserDTO;
+import it.unical.demacs.informatica.KairosBackend.dto.user.UserPasswordUpdateDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.user.UserUpdateDTO;
 import it.unical.demacs.informatica.KairosBackend.exception.ResourceNotFoundException;
 import jakarta.validation.Valid;
@@ -128,6 +129,32 @@ public class UserController {
     ) {
         log.info("Updating user with id {}", userId);
         return ResponseEntity.ok(userService.updateUser(userId, userDTO));
+    }
+
+    @Operation(
+            summary = "Change user password",
+            description = "Allows an authenticated user to change their password.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Old and new passwords", required = true,
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserPasswordUpdateDTO.class))
+            ),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Password successfully changed"),
+                    @ApiResponse(responseCode = "400", description = "Invalid input or incorrect old password",
+                            content = @Content(schema = @Schema(implementation = UserPasswordUpdateDTO.class))),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized",
+                            content = @Content(schema = @Schema())),
+                    @ApiResponse(responseCode = "404", description = "User not found",
+                            content = @Content(schema = @Schema(implementation = ServiceError.class)))
+            }
+    )
+    @PutMapping("/change-password")
+    public ResponseEntity<Void> changePassword(@Valid @RequestBody UserPasswordUpdateDTO request) {
+        UUID userId = authService.getCurrentUserId();
+        userService.updateUserPassword(userId, request.getOldPassword(), request.getNewPassword());
+        log.info("Password changed successfully for user with id: {}", userId);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(

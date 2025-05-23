@@ -11,11 +11,12 @@ public interface WishlistService {
 
     WishlistDTO createWishlist(WishlistCreateDTO wishlistCreateDTO);
     void deleteWishlist(UUID wishlistId);
-    WishlistDTO updateWishlist(WishlistUpdateDTO wishlistUpdateDTO, UUID creatorId);
+    WishlistDTO updateWishlist(UUID wishlistID, WishlistUpdateDTO wishlistUpdateDTO);
 
     Boolean wishlistAlreadyExists(UUID creatorId, String name);
 
     WishlistDTO addUserToWishlist(UUID wishlistId, UUID userId);
+    //TODO acceptWishlist method: the user will accept the pending wishlist invite.
     void removeUserFromWishlist(UUID wishlistId, UUID userId);
 
     WishlistDTO addEventToWishlist(UUID wishlistId, UUID eventId);

@@ -221,20 +221,6 @@ public class AuthController {
     }
 
     @Operation(
-            summary = "Logout success message",
-            description = "Endpoint to indicate successful logout.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Logout successful",
-                            content = @Content(mediaType = "text/plain", schema = @Schema(type = "string")))
-            }
-    )
-    @GetMapping("/logout/success")
-    public ResponseEntity<String> logoutSuccess() {
-        log.info("User logged out successfully");
-        return ResponseEntity.ok("Logout successful");
-    }
-
-    @Operation(
             summary = "OAuth2 login failure message",
             description = "Endpoint to indicate a failed OAuth2 login attempt.",
             responses = {

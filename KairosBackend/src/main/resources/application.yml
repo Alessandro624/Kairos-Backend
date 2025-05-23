@@ -10,6 +10,9 @@ security:
     - /swagger-ui/**
     - /swagger-ui.html
     - /actuator/**
+    - /v1/auth/confirm
+    - /v1/auth/forgot-password
+    - /v1/auth/reset-password
   protected-routes:
     /v1/users: ROLE_ADMIN
     /v1/users/admin: ROLE_ADMIN

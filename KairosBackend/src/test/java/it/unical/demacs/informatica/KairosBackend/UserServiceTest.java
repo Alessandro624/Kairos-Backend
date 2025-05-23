@@ -43,6 +43,8 @@ public class UserServiceTest {
 
     private static UUID testUserId;
     private static UUID adminUserId;
+    private static UUID googleUserId;
+    private static UUID nonVerifiedUserId;
 
     private static boolean isInitialized = false;
 
@@ -59,7 +61,6 @@ public class UserServiceTest {
     }
 
     private void setUpAuditor() {
-        // To see if auditing works
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(new UsernamePasswordAuthenticationToken("testAuditUser", "Password123", Collections.emptyList()));
         SecurityContextHolder.setContext(context);
@@ -93,6 +94,16 @@ public class UserServiceTest {
             if (adminUserId == null && record.get("role").equals("ADMIN")) {
                 Optional<UserDTO> createdUser = userService.findByUsername(user.getUsername());
                 adminUserId = createdUser.map(UserDTO::getId).orElse(null);
+            }
+
+            if (googleUserId == null && record.get("provider").equals("GOOGLE")) {
+                Optional<UserDTO> createdUser = userService.findByUsername(user.getUsername());
+                googleUserId = createdUser.map(UserDTO::getId).orElse(null);
+            }
+
+            if (nonVerifiedUserId == null && record.get("emailVerified").equals("false")) {
+                Optional<UserDTO> createdUser = userService.findByUsername(user.getUsername());
+                nonVerifiedUserId = createdUser.map(UserDTO::getId).orElse(null);
             }
         }
 
@@ -309,6 +320,26 @@ public class UserServiceTest {
     }
 
     @Test
+    public void testUpdateUserPasswordIncorrectOldPasswordFails() {
+        assertNotNull(testUserId, "Test user ID should not be null");
+        String incorrectOldPassword = "wrongPassword";
+        String newPassword = "newPassword123";
+
+        assertThrows(IllegalArgumentException.class, () -> userService.updateUserPassword(testUserId, incorrectOldPassword, newPassword),
+                "Updating password with incorrect old password should fail");
+    }
+
+    @Test
+    public void testUpdateUserPasswordNonLocalUserFails() {
+        assertNotNull(googleUserId, "Google user ID should not be null");
+        String oldPassword = "";
+        String newPassword = "newPassword123";
+
+        assertThrows(IllegalArgumentException.class, () -> userService.updateUserPassword(googleUserId, oldPassword, newPassword),
+                "Updating password for non-local user should fail");
+    }
+
+    @Test
     public void testMakeUserAdmin() {
         assertNotNull(testUserId, "Test user ID should not be null");
 
@@ -325,5 +356,48 @@ public class UserServiceTest {
         Optional<UserDTO> user = userService.findById(nonExistingId);
 
         assertFalse(user.isPresent(), "No user should be found for non-existing ID");
+    }
+
+    @Test
+    public void testResetUserPassword() {
+        assertNotNull(testUserId, "test user ID for password reset should not be null");
+        String newPassword = "resetPassword123";
+        Optional<UserDTO> userBeforeReset = userService.findById(testUserId);
+        assertTrue(userBeforeReset.isPresent());
+
+        userService.resetUserPassword(userBeforeReset.get().getUsername(), newPassword);
+
+        assertTrue(userService.findById(testUserId).isPresent(), "User should still exist after password reset");
+    }
+
+    @Test
+    public void testResetUserPasswordNonExistingUserFails() {
+        String nonExistingUsernameOrEmail = "nonexisting";
+        String newPassword = "resetPassword123";
+
+        assertThrows(Exception.class, () -> userService.resetUserPassword(nonExistingUsernameOrEmail, newPassword),
+                "Resetting password for non-existing user should fail");
+    }
+
+    @Test
+    public void testResetUserPasswordOAuthUserFails() {
+        assertNotNull(googleUserId, "Google user ID should not be null");
+        String newPassword = "newPassword123";
+        Optional<UserDTO> userBeforeReset = userService.findById(testUserId);
+        assertTrue(userBeforeReset.isPresent());
+
+        assertThrows(IllegalArgumentException.class, () -> userService.resetUserPassword(userBeforeReset.get().getUsername(), newPassword),
+                "Updating password for non-local user should fail");
+    }
+
+    @Test
+    public void testActivateUser() {
+        assertNotNull(nonVerifiedUserId, "Non-verified user ID should not be null");
+        Optional<UserDTO> userBeforeActivation = userService.findById(nonVerifiedUserId);
+        assertTrue(userBeforeActivation.isPresent());
+
+        userService.activateUser(userBeforeActivation.get().getUsername());
+
+        assertTrue(userService.findById(nonVerifiedUserId).isPresent(), "User should still exist after activation");
     }
 }

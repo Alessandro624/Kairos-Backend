@@ -34,3 +34,6 @@ kairos:
 
   rate-limiter:
     permits-per-second: 10
+
+  reset-password:
+    expiration: 600000

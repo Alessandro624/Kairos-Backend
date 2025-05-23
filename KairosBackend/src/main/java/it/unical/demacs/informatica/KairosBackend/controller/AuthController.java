@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import it.unical.demacs.informatica.KairosBackend.core.service.EmailService;
 import it.unical.demacs.informatica.KairosBackend.core.service.JwtService;
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Provider;
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.UserRole;
@@ -13,6 +14,8 @@ import it.unical.demacs.informatica.KairosBackend.data.services.UserService;
 import it.unical.demacs.informatica.KairosBackend.dto.ServiceError;
 import it.unical.demacs.informatica.KairosBackend.dto.auth.AuthRequest;
 import it.unical.demacs.informatica.KairosBackend.dto.auth.AuthResponse;
+import it.unical.demacs.informatica.KairosBackend.dto.auth.PasswordResetConfirmation;
+import it.unical.demacs.informatica.KairosBackend.dto.auth.PasswordResetRequest;
 import it.unical.demacs.informatica.KairosBackend.dto.user.UserCreateDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping(path = "/v1/auth", produces = "application/json")
@@ -35,6 +39,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
     private final UserService userService;
+    private final EmailService emailService;
 
     @Operation(
             summary = "Login user",
@@ -115,6 +120,74 @@ public class AuthController {
         userService.createUser(userCreateDTO);
         log.info("User registration successful for username: {}", userCreateDTO.getUsername());
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "Request password reset",
+            description = "Initiates the password reset process by sending a reset link to the user's email.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "User's username or email to send the reset link to", required = true,
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = PasswordResetRequest.class))
+            ),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Password reset link sent successfully (or if user not found, to prevent enumeration)"),
+                    @ApiResponse(responseCode = "400", description = "Invalid input",
+                            content = @Content(schema = @Schema(implementation = ServiceError.class)))
+            }
+    )
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody PasswordResetRequest request) {
+        log.info("Password reset request for: {}", request.getUsernameOrEmail());
+
+        userService.findByUsernameOrEmail(request.getUsernameOrEmail())
+                .ifPresent(userDTO -> {
+                    if (userDTO.getProvider() == Provider.LOCAL) {
+                        String resetToken = jwtService.generatePasswordResetToken(userDTO.getUsername());
+                        String resetLink = ServletUriComponentsBuilder.fromCurrentContextPath()
+                                .path("/v1/auth/reset-password")
+                                .queryParam("token", resetToken)
+                                .toUriString();
+
+                        log.info("Sending password reset email to '{}'", userDTO.getEmail());
+                        emailService.sendPasswordResetEmail(userDTO.getEmail(), userDTO.getUsername(), resetLink);
+                    }
+                });
+
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "Confirm password reset",
+            description = "Resets the user's password using a valid reset token.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "New password and the reset token", required = true,
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = PasswordResetConfirmation.class))
+            ),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Password successfully reset"),
+                    @ApiResponse(responseCode = "400", description = "Invalid or expired token, or invalid input",
+                            content = @Content(schema = @Schema(implementation = ServiceError.class))),
+                    @ApiResponse(responseCode = "404", description = "User not found",
+                            content = @Content(schema = @Schema(implementation = ServiceError.class)))
+            }
+    )
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody PasswordResetConfirmation request) {
+        log.debug("Processing password reset confirmation");
+
+        if (!jwtService.isTokenValid(request.getToken(), "reset-password")) {
+            log.warn("Invalid or expired password reset token: {}", request.getToken());
+            return ResponseEntity.badRequest().build();
+        }
+
+        String username = jwtService.extractUsername(request.getToken());
+
+        userService.resetUserPassword(username, request.getNewPassword());
+        log.info("Password successfully reset for user: {}", username);
+        return ResponseEntity.ok().build();
+
     }
 
     @Operation(

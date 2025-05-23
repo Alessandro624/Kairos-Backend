@@ -26,6 +26,9 @@ public class JwtService {
     @Value("${kairos.cleanup.email-verification.delay}")
     private long emailVerificationExpiration;
 
+    @Value("${kairos.reset-password.expiration}")
+    private long passwordResetExpiration;
+
     private Key getSignKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
@@ -56,6 +59,10 @@ public class JwtService {
 
     public String generateEmailVerificationToken(String username) {
         return buildToken(username, "email-verification", emailVerificationExpiration, null);
+    }
+
+    public String generatePasswordResetToken(String username) {
+        return buildToken(username, "reset-password", passwordResetExpiration, null);
     }
 
     private String buildToken(String subject, String type, long expiration, Object claims) {

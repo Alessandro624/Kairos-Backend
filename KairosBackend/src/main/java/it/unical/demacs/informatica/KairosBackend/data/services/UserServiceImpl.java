@@ -94,15 +94,34 @@ public class UserServiceImpl implements UserService {
     public void updateUserPassword(UUID userId, String oldPassword, String newPassword) {
         log.info("Updating password for user with id {}", userId);
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
+
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new IllegalArgumentException("Old password is incorrect");
         }
+
         if (user.getProvider() != Provider.LOCAL) {
             throw new IllegalArgumentException("Only local users can update password");
         }
+
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         log.info("Updated password for user with id {}", userId);
+    }
+
+    @Override
+    @Transactional
+    public void resetUserPassword(String username, String newPassword) {
+        log.info("Resetting password for user: {}", username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User " + username + " not found"));
+
+        if (user.getProvider() != Provider.LOCAL) {
+            throw new IllegalArgumentException("Cannot reset password for users authenticated via " + user.getProvider());
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        log.info("Password reset successfully for user: {}", username);
     }
 
     @Override

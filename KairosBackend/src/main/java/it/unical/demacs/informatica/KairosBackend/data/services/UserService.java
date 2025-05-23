@@ -42,5 +42,6 @@ public interface UserService {
 
     boolean existsEmail(String email);
 
+    @SuppressWarnings("unused")
     void cleanUpUnverifiedUsers();
 }

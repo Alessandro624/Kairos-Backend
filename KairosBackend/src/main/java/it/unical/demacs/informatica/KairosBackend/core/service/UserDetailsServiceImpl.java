@@ -21,7 +21,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String usernameOrEmail) {
         log.debug("Attempting to load user details for username or email: {}", usernameOrEmail);
-        // TODO better role handling, maybe with a set of roles
         User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 

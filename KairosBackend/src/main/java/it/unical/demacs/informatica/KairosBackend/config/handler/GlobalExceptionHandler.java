@@ -32,8 +32,6 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
     private final MessageReader messageReader;
 
-    // TODO add missing exceptions and create new custom ones for them.
-
     //FIXME internationalization is not necessary for all the exceptions...
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

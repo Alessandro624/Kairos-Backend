@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import it.unical.demacs.informatica.KairosBackend.config.i18n.MessageReader;
 import it.unical.demacs.informatica.KairosBackend.core.service.AuthService;
 import it.unical.demacs.informatica.KairosBackend.data.services.UserService;
 import it.unical.demacs.informatica.KairosBackend.dto.ServiceError;
@@ -36,6 +37,7 @@ import java.util.UUID;
 public class UserController {
     private final UserService userService;
     private final AuthService authService;
+    private final MessageReader messageReader;
 
     @Operation(
             summary = "Get all users",
@@ -192,7 +194,10 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserDTO> getCurrentUser() {
         log.info("Getting current user");
-        return ResponseEntity.ok(userService.findById(authService.getCurrentUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found")));
+        UUID currentUserId = authService.getCurrentUserId();
+        return ResponseEntity.ok(userService.findById(currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        messageReader.getMessage("user.notfound.id", currentUserId.toString())
+                )));
     }
 }

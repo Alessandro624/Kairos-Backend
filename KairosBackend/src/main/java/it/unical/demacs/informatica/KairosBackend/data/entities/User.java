@@ -64,13 +64,9 @@ public class User extends AuditableEntity {
     @ManyToMany(mappedBy = "sharedUsers")
     private List<Wishlist> sharedWishlists;
 
-    // TODO tickets mapping (only role == PARTICIPANT)
-    // @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    // private List<Ticket> tickets;
+    @OneToMany(mappedBy = "userParticipant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Ticket> tickets;
 
-    // TODO events mapping (only role == ORGANIZER), needs to be a @ManyToOne on event side
-    // @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL, orphanRemoval = true)
-    // private List<Event> events;
-
-    // TODO think of using Set instead of List
+    @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Event> events;
 }

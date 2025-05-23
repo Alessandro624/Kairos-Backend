@@ -12,6 +12,8 @@
 # export GOOGLE_CLIENT_SECRET_KAIROS="your-google-client-secret"
 # export KEYCLOAK_CLIENT_ID_KAIROS="your-keycloak-client-id"
 # export KEYCLOAK_CLIENT_SECRET_KAIROS="your-keycloak-client-secret"
+# export SPRING_MAIL_USERNAME_KAIROS="your-spring-mail-username"
+# export SPRING_MAIL_PASSWORD_KAIROS="your-spring-mail-password"
 
 #============================================
 # HELPER FUNCTIONS
@@ -109,8 +111,6 @@ if docker compose up --build -d; then
 else
     echo "ERROR: Unable to start Docker containers!"
     cleanup
-    # shellcheck disable=SC2317
-    exit 1
 fi
 
 #============================================

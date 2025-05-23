@@ -43,7 +43,7 @@ public class Event extends AuditableEntity {
     @Column(name = "datetime", nullable = false)
     private LocalDateTime dateTime;
 
-    @Size(min=1)
+    @Size(min = 1)
     @Column(name = "maxparticipants", nullable = false)
     private int maxParticipants;
 

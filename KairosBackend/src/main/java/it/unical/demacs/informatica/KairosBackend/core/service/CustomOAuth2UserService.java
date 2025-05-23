@@ -93,7 +93,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         user.setPassword(UUID.randomUUID().toString());
         user.setFirstName(attributes.get("given_name").toString());
         user.setLastName(attributes.get("family_name").toString());
-        user.setEmailVerified(Boolean.parseBoolean(attributes.get("email_verified").toString()));
+        user.setEmailVerified(true);
         user.setProvider(provider);
         user.setRole(extractUserRole(extractRoles(attributes)));
         return userRepository.save(user);

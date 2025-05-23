@@ -1,5 +1,6 @@
 security:
   enabled: true
+  email-verification: true
   public-endpoints:
     - /v1/auth/login
     - /v1/auth/register
@@ -9,8 +10,33 @@ security:
     - /swagger-ui/**
     - /swagger-ui.html
     - /actuator/**
+    - /v1/auth/confirm
+    - /v1/auth/forgot-password
+    - /v1/auth/reset-password
   protected-routes:
-    /example/{idExample}: ROLE_ADMIN, ROLE_USER
-    /example/example: ROLE_USER
-    /example/POST: ROLE_ADMIN
-    /example/{idExample}/PUT: ROLE_ADMIN
+    '[/v1/users]': ROLE_ADMIN
+    '[/v1/users/admin]': ROLE_ADMIN
+    '[/v1/users/{userId}/DELETE]': ROLE_ADMIN
+    '[/v1/users/{userId}/make-admin]': ROLE_ADMIN
+
+    '[/example/{idExample}]': ROLE_ADMIN, ROLE_USER
+    '[/example/example]': ROLE_USER
+    '[/example/POST]': ROLE_ADMIN
+    '[/example/{idExample}/PUT]': ROLE_ADMIN
+
+kairos:
+  cleanup:
+    email-verification:
+      minutes: 15
+      delay: 900000
+      initial-delay: 500
+
+    user-cache:
+      delay: 600000
+      initial-delay: 500
+
+  rate-limiter:
+    permits-per-second: 10
+
+  reset-password:
+    expiration: 600000

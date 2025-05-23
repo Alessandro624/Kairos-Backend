@@ -1,6 +1,7 @@
 package it.unical.demacs.informatica.KairosBackend.data.services;
 
 import it.unical.demacs.informatica.KairosBackend.config.CacheConfig;
+import it.unical.demacs.informatica.KairosBackend.config.i18n.MessageReader;
 import it.unical.demacs.informatica.KairosBackend.data.entities.User;
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Provider;
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.UserRole;
@@ -35,6 +36,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
+    private final MessageReader messageReader;
 
     @Value("${kairos.cleanup.email-verification.minutes:15}")
     private long userVerificationEmailExpiration;
@@ -78,7 +80,9 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDTO updateUser(UUID userId, UserUpdateDTO userDTO) {
         log.info("Updating user with id {}", userId);
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(
+                messageReader.getMessage("user.notfound.id", userId.toString())
+        ));
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
         if (userDTO.getPhoneNumber() != null) {
@@ -93,22 +97,65 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void updateUserPassword(UUID userId, String oldPassword, String newPassword) {
         log.info("Updating password for user with id {}", userId);
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(
+                messageReader.getMessage("user.notfound.id", userId.toString())
+        ));
+
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-            throw new IllegalArgumentException("Old password is incorrect");
+            throw new IllegalArgumentException(messageReader.getMessage("user.password.incorrect"));
         }
+
         if (user.getProvider() != Provider.LOCAL) {
-            throw new IllegalArgumentException("Only local users can update password");
+            throw new IllegalArgumentException(messageReader.getMessage("user.password.localonly"));
         }
+
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         log.info("Updated password for user with id {}", userId);
     }
 
     @Override
+    @Transactional
+    public void resetUserPassword(String username, String newPassword) {
+        log.info("Resetting password for user: {}", username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        messageReader.getMessage("user.notfound.username", username)
+                ));
+
+        if (user.getProvider() != Provider.LOCAL) {
+            throw new IllegalArgumentException(
+                    messageReader.getMessage("user.password.reset_provider_error", user.getProvider().toString())
+            );
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        log.info("Password reset successfully for user: {}", username);
+    }
+
+    @Override
+    @Transactional
+    public void activateUser(String username) {
+        log.info("Activating user with username {}", username);
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException(
+                messageReader.getMessage("user.notfound.username", username)
+        ));
+        if (!user.isEmailVerified()) {
+            user.setEmailVerified(true);
+            User savedUser = userRepository.save(user);
+            log.info("Activated user with username {}", savedUser.getUsername());
+        } else {
+            log.info("User with username {} already activated", username);
+        }
+    }
+
+    @Override
     public UserDTO makeUserAdmin(UUID userId) {
         log.info("Making user with id {} an admin", userId);
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(
+                messageReader.getMessage("user.notfound.id", userId.toString())
+        ));
         user.setRole(UserRole.ADMIN);
         User savedUser = userRepository.save(user);
         log.info("Made user with id {} an admin", userId);
@@ -119,18 +166,20 @@ public class UserServiceImpl implements UserService {
     public UserDTO createUser(UserCreateDTO userDTO) {
         log.info("Creating user {}", userDTO);
         if (userRepository.existsByUsername(userDTO.getUsername())) {
-            throw new ResourceAlreadyExistsException("Username " + userDTO.getUsername() + " already exists");
+            throw new ResourceAlreadyExistsException(
+                    messageReader.getMessage("user.username.exists", userDTO.getUsername())
+            );
         }
         if (userRepository.existsByEmail(userDTO.getEmail())) {
-            throw new ResourceAlreadyExistsException("Email " + userDTO.getEmail() + " already exists");
+            throw new ResourceAlreadyExistsException(
+                    messageReader.getMessage("user.email.exists", userDTO.getEmail())
+            );
         }
         User newUser = modelMapper.map(userDTO, User.class);
         newUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         newUser.setEmailVerified(!emailVerificationEnabled);
         User savedUser = userRepository.save(newUser);
         log.info("Created user {}", savedUser);
-        // TODO send verification email or handle it with another service
-        // TODO handle other object creations
         return modelMapper.map(savedUser, UserDTO.class);
     }
 
@@ -157,8 +206,9 @@ public class UserServiceImpl implements UserService {
     @CacheEvict(value = CacheConfig.CACHE_FOR_USER, allEntries = true)
     public void deleteUser(UUID userId) {
         log.info("Deleting user with id {}", userId);
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User " + userId + " not found"));
-        // TODO clean other things (profile image, wishlist, ..)
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(
+                messageReader.getMessage("user.notfound.id", userId.toString())
+        ));
         userRepository.delete(user);
     }
 

@@ -47,7 +47,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     log.debug("Extracted username from token: {}", username);
 
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                    if (jwtService.isTokenValid(token, userDetails)) {
+                    if (jwtService.isAuthTokenValid(token, userDetails)) {
                         Authentication authentication = SecurityUtils.createAuthentication(userDetails, request);
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                         log.debug("Authentication stored in SecurityContext for user: {}", username);

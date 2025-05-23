@@ -11,7 +11,6 @@ public class ModelMapperConfig {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setFieldMatchingEnabled(true)
                 .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PUBLIC);
-        // TODO Add other mapping if needed
         return modelMapper;
     }
 }

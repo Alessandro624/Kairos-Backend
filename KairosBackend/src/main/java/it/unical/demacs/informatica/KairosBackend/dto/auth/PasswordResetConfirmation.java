@@ -1,4 +1,4 @@
-package it.unical.demacs.informatica.KairosBackend.dto.user;
+package it.unical.demacs.informatica.KairosBackend.dto.auth;
 
 import it.unical.demacs.informatica.KairosBackend.dto.annotations.Password;
 import jakarta.validation.constraints.NotBlank;
@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserPasswordUpdateDTO {
-    @NotBlank(message = "OldPassword cannot be blank")
-    private String oldPassword;
+public class PasswordResetConfirmation {
+    @NotBlank(message = "Token is required")
+    private String token;
 
     @NotBlank(message = "NewPassword cannot be blank")
     @Password(max = 15, allowedSymbols = "@#$%^&+=!*()-_")

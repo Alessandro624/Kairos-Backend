@@ -16,8 +16,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class StripeServiceImpl implements StripeService {
 
-    private EventService eventService;
-    private TicketService ticketService;
+    private final EventService eventService;
+    private final TicketService ticketService;
 
 
     // https://docs.stripe.com/connect/collect-then-transfer-guide?lang=java&connect-account-creation-pattern=typeless

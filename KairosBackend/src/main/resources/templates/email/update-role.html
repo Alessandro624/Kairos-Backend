@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Role Update</title>
+    <title th:text="#{role.update.title}">Role Update</title>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -66,19 +66,19 @@
 <body>
 <div class="container">
     <div class="header">
-        <h2>Role Update</h2>
+        <h2 th:text="#{role.update.title}">Role Update</h2>
     </div>
     <div class="content">
-        <p>Hello <strong th:text="${username}">User</strong>,</p>
-        <p>We are pleased to inform you that your role has been updated
-            to <strong th:text="${newRole}">[New Role]</strong>.</p>
-        <p>You now have access to new features and functionalities based on
+        <p><span th:text="#{email.greetings}">Hello</span> <strong th:text="${username}">User</strong>,</p>
+        <p th:text="#{role.update.body}">We are pleased to inform you that your role has been updated
+            <span th:text="#{role.update.to}">to</span> <strong th:text="${newRole}">[New Role]</strong>.</p>
+        <p th:text="#{role.update.access}">You now have access to new features and functionalities based on
             your updated role.</p>
-        <p>Best regards,</p>
-        <p>The Kairos Team</p>
+        <p th:text="#{email.best_regards}">Best regards,</p>
+        <p th:text="#{email.team}">The Kairos Team</p>
     </div>
     <div class="footer">
-        <p>&copy; 2025 Kairos. All rights reserved.</p>
+        <p th:text="#{email.footer}">© 2025 Kairos. All rights reserved.</p>
     </div>
 </div>
 </body>

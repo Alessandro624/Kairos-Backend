@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Verified</title>
+    <title th:text="#{email.confirmed.title}">Email Verified</title>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -48,8 +48,9 @@
 <body>
 <div class="container">
     <i class="fas fa-check-circle icon"></i>
-    <h1>Email Successfully Verified!</h1>
-    <p>Your email has been successfully verified. You can now return to the login page.</p>
+    <h1 th:text="#{email.confirmed.heading}">Email Successfully Verified!</h1>
+    <p th:text="#{email.confirmed.body}">Your email has been successfully verified. You can now return to the login
+        page.</p>
 </div>
 </body>
 </html>

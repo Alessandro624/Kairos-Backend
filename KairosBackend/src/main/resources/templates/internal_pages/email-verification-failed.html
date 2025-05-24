@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Verification Failed</title>
+    <title th:text="#{email.failed.title}">Email Verification Failed</title>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -48,8 +48,9 @@
 <body>
 <div class="container">
     <i class="fas fa-times-circle icon"></i>
-    <h1>Email Verification Failed!</h1>
-    <p>The email verification link is invalid or has expired. Please try registering again or contact support.</p>
+    <h1 th:text="#{email.failed.heading}">Email Verification Failed!</h1>
+    <p th:text="#{email.failed.body}">The email verification link is invalid or has expired. Please try registering
+        again or contact support.</p>
 </div>
 </body>
 </html>

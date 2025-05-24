@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Confirmation</title>
+    <title th:text="#{email.confirmation.title}">Confirm Your Email Address</title>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -25,7 +25,7 @@
         }
 
         .header {
-            background-color: #4F46E5; /* Indigo 600 */
+            background-color: #4F46E5;
             color: #ffffff;
             padding: 20px;
             text-align: center;
@@ -92,23 +92,26 @@
 <body>
 <div class="container">
     <div class="header">
-        <h2>Confirm Your Email Address</h2>
+        <h2 th:text="#{email.confirmation.title}">Confirm Your Email Address</h2>
     </div>
     <div class="content">
-        <p>Hello <strong th:text="${username}">User</strong>,</p>
-        <p>Thank you for registering with our service. To complete your registration and activate your account, please
-            confirm your email address by clicking the button below:</p>
+        <p><span th:text="#{email.greetings}">Hello</span> <strong th:text="${username}">User</strong>,</p>
+        <p th:text="#{email.confirmation.thank_you}">Thank you for registering with our service. To complete your
+            registration and activate your account, please confirm your email address by clicking the button below:</p>
         <div class="button-container">
-            <a th:href="${confirmationLink}" class="button">Confirm Email</a>
+            <a th:href="${confirmationLink}" class="button" th:text="#{email.confirmation.confirm_button}">Confirm
+                Email</a>
         </div>
-        <p>If the button above does not work, please copy and paste the following link into your web browser:</p>
+        <p th:text="#{email.link_instruction}">If the button above does not work, please copy and paste the
+            following link into your web browser:</p>
         <p><a th:href="${confirmationLink}" th:text="${confirmationLink}">Confirmation Link</a></p>
-        <p>If you did not register for this service, please disregard this email.</p>
-        <p>Best regards,</p>
-        <p>The Kairos Team</p>
+        <p th:text="#{email.confirmation.disregard}">If you did not register for this service, please disregard this
+            email.</p>
+        <p th:text="#{email.best_regards}">Best regards,</p>
+        <p th:text="#{email.team}">The Kairos Team</p>
     </div>
     <div class="footer">
-        <p>&copy; 2025 Kairos. All rights reserved.</p>
+        <p th:text="#{email.footer}">© 2025 Kairos. All rights reserved.</p>
     </div>
 </div>
 </body>

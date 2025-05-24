@@ -21,19 +21,15 @@ import it.unical.demacs.informatica.KairosBackend.dto.user.UserCreateDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.util.Locale;
 
 @RestController
 @RequestMapping(path = "/v1/auth", produces = "application/json")
@@ -165,6 +161,37 @@ public class AuthController {
     }
 
     @Operation(
+            summary = "Show password reset form",
+            description = "Displays the password reset form if the provided token is valid.",
+            parameters = {
+                    @Parameter(name = "token", description = "The password reset token", required = true,
+                            schema = @Schema(type = "string"))
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Password reset form displayed",
+                            content = @Content(mediaType = "text/html")),
+                    @ApiResponse(responseCode = "400", description = "Invalid or expired token",
+                            content = @Content(mediaType = "text/html"))
+            }
+    )
+    @GetMapping("/reset-password")
+    public ModelAndView showResetPasswordForm(@Parameter(hidden = true) @RequestParam String token) {
+        log.debug("Processing password reset form request with token: {}", token);
+        ModelAndView modelAndView = new ModelAndView();
+
+        if (!jwtService.isTokenValid(token, "reset-password")) {
+            log.warn("Invalid or expired password reset token provided for form display: {}", token);
+            modelAndView.setViewName("internal_pages/password-reset-failed");
+            return modelAndView;
+        }
+
+        modelAndView.addObject("token", token);
+        modelAndView.setViewName("internal_pages/reset-password-form");
+        log.info("Displaying password reset form for valid token.");
+        return modelAndView;
+    }
+
+    @Operation(
             summary = "Confirm password reset",
             description = "Resets the user's password using a valid reset token.",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -194,7 +221,6 @@ public class AuthController {
         userService.resetUserPassword(username, request.getNewPassword());
         log.info("Password successfully reset for user: {}", username);
         return ResponseEntity.ok().build();
-
     }
 
     @Operation(
@@ -216,23 +242,19 @@ public class AuthController {
     @GetMapping("/confirm")
     public ModelAndView confirmEmail(@Parameter(hidden = true) @RequestParam String token) {
         log.debug("Processing email confirmation with token: {}", token);
-        Locale locale = LocaleContextHolder.getLocale();
-        String templateName = "";
         ModelAndView modelAndView = new ModelAndView();
 
         if (!jwtService.isTokenValid(token, "email-verification")) {
             log.warn("Email verification token is invalid or expired: {}", token);
-            templateName = "internal_pages/email-verification-failed_" + locale.getLanguage();
-            modelAndView.setViewName(templateName);
+            modelAndView.setViewName("internal_pages/email-verification-failed");
             return modelAndView;
         }
 
-        templateName = "internal_pages/email-confirmed_" + locale.getLanguage();
         String username = jwtService.extractUsername(token);
         userService.activateUser(username);
         log.info("Email verification successful for user: {}", username);
 
-        modelAndView.setViewName(templateName);
+        modelAndView.setViewName("internal_pages/email-confirmed");
         return modelAndView;
     }
 

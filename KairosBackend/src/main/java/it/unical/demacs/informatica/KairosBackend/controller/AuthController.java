@@ -28,7 +28,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Locale;
@@ -212,22 +214,26 @@ public class AuthController {
             }
     )
     @GetMapping("/confirm")
-    public String confirmEmail(@Parameter(hidden = true) @RequestParam String token) {
+    public ModelAndView confirmEmail(@Parameter(hidden = true) @RequestParam String token) {
         log.debug("Processing email confirmation with token: {}", token);
         Locale locale = LocaleContextHolder.getLocale();
-        String templatePath = "internal_pages/";
+        String templateName = "";
+        ModelAndView modelAndView = new ModelAndView();
 
         if (!jwtService.isTokenValid(token, "email-verification")) {
             log.warn("Email verification token is invalid or expired: {}", token);
-            templatePath += "email-verification-failed" + "_" + locale.getLanguage();
-            return templatePath;
+            templateName = "internal_pages/email-verification-failed_" + locale.getLanguage();
+            modelAndView.setViewName(templateName);
+            return modelAndView;
         }
 
-        templatePath += "email-confirmed" + "_" + locale.getLanguage();
+        templateName = "internal_pages/email-confirmed_" + locale.getLanguage();
         String username = jwtService.extractUsername(token);
         userService.activateUser(username);
         log.info("Email verification successful for user: {}", username);
-        return templatePath;
+
+        modelAndView.setViewName(templateName);
+        return modelAndView;
     }
 
     @Operation(

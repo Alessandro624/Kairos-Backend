@@ -1,5 +1,6 @@
 package it.unical.demacs.informatica.KairosBackend.core.service;
 
+import it.unical.demacs.informatica.KairosBackend.config.i18n.MessageReader;
 import it.unical.demacs.informatica.KairosBackend.data.entities.User;
 import it.unical.demacs.informatica.KairosBackend.data.repository.UserRepository;
 import it.unical.demacs.informatica.KairosBackend.exception.ResourceNotFoundException;
@@ -17,12 +18,13 @@ import java.util.List;
 @Slf4j
 public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
+    private final MessageReader messageReader;
 
     @Override
     public UserDetails loadUserByUsername(String usernameOrEmail) {
         log.debug("Attempting to load user details for username or email: {}", usernameOrEmail);
         User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(messageReader.getMessage("user.notfound.username")));
 
         log.debug("Found user: {}. Building UserDetails object", user.getUsername());
         return org.springframework.security.core.userdetails.User.builder()

@@ -1,6 +1,5 @@
 package it.unical.demacs.informatica.KairosBackend.dto.auth;
 
-import it.unical.demacs.informatica.KairosBackend.dto.annotations.Password;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

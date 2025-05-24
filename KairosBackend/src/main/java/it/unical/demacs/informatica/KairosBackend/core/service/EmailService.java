@@ -54,7 +54,7 @@ public class EmailService {
             log.info("Email sent successfully to '{}'", to);
         } catch (MessagingException e) {
             log.error("Failed to send email to '{}'", to, e);
-            throw new EmailNotSentException("Failed to send email");
+            throw new EmailNotSentException(messageReader.getMessage("email.not_sent.failure"));
         }
     }
 

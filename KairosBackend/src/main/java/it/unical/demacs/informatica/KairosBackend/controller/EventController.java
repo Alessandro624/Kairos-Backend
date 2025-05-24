@@ -34,7 +34,7 @@ public class EventController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping
-    public ResponseEntity<Page<EventDTO>> getAllEvents(@RequestParam Pageable pageable, @RequestParam(required = false) EventSpecifications.Filter filter) {
+    public ResponseEntity<Page<EventDTO>> getAllEvents(@RequestParam Pageable pageable, @ModelAttribute @RequestParam(required = false) EventSpecifications.Filter filter) {
         return ResponseEntity.ok(eventService.getEventsByFilter(filter, pageable));
     }
 

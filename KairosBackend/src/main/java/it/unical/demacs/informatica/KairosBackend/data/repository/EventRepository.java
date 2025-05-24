@@ -7,6 +7,7 @@ import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Categ
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Repository
-public interface EventRepository extends JpaRepository<Event, UUID>, PagingAndSortingRepository<Event, UUID> {
+public interface EventRepository extends JpaRepository<Event, UUID>, PagingAndSortingRepository<Event, UUID>, JpaSpecificationExecutor<Event> {
     @Query("SELECT CASE WHEN COUNT(e) > 0 THEN true ELSE false END " +
             "FROM Event e " +
             "WHERE lower(e.title) = lower(:title) AND e.dateTime = :data " +
@@ -26,13 +27,14 @@ public interface EventRepository extends JpaRepository<Event, UUID>, PagingAndSo
 
     @Query("SELECT e FROM Event e " +
             "WHERE e.structure.address.city = :city OR e.structure.address.zipCode = :zip " +
-            "AND e.isVisible = True AND e.dateTime >= :fromDate " +
+            "AND e.dateTime >= :fromDate " +
             "ORDER BY e.dateTime ASC")
     Page<Event> findEventsNearLocationStartingFrom(@Param("city") String city, @Param("zip") String zip,
                                                    @Param("fromDate") LocalDateTime now, Pageable pageable);
 
-    Page<Event> findAllByOrganizerAndVisibleTrueOrderByDateTimeAsc(User user, Pageable pageable);
-    Page<Event> findAllByDateTimeBetweenAndVisibleTrueOrderByDateTimeAsc(LocalDateTime from, LocalDateTime to, Pageable pageable);
-    Page<Event> findAllByStructureAndVisibleTrueOrderByDateTimeAsc(Structure structure, Pageable pageable);
-    Page<Event> findAllByCategoryAndVisibleTrueOrderByDateTimeAsc(Category category, Pageable pageable);
+    // posso rimuoverli?
+    Page<Event> findAllByOrganizerOrderByDateTimeAsc(User user, Pageable pageable);
+    Page<Event> findAllByDateTimeBetweenOrderByDateTimeAsc(LocalDateTime from, LocalDateTime to, Pageable pageable);
+    Page<Event> findAllByStructureOrderByDateTimeAsc(Structure structure, Pageable pageable);
+    Page<Event> findAllByCategoryOrderByDateTimeAsc(Category category, Pageable pageable);
 }

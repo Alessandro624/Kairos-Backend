@@ -21,6 +21,7 @@ import it.unical.demacs.informatica.KairosBackend.dto.user.UserCreateDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,6 +30,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.util.Locale;
 
 @RestController
 @RequestMapping(path = "/v1/auth", produces = "application/json")
@@ -200,26 +203,31 @@ public class AuthController {
                             schema = @Schema(type = "string"))
             },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Email successfully verified"),
+                    @ApiResponse(responseCode = "200", description = "Email successfully verified",
+                            content = @Content(mediaType = "text/html")),
                     @ApiResponse(responseCode = "400", description = "Invalid verification link",
-                            content = @Content(schema = @Schema(implementation = ServiceError.class))),
+                            content = @Content(mediaType = "text/html")),
                     @ApiResponse(responseCode = "404", description = "User not found",
-                            content = @Content(schema = @Schema(implementation = ServiceError.class)))
+                            content = @Content(mediaType = "text/html"))
             }
     )
     @GetMapping("/confirm")
-    public ResponseEntity<?> confirmEmail(@Parameter(hidden = true) @RequestParam String token) {
+    public String confirmEmail(@Parameter(hidden = true) @RequestParam String token) {
         log.debug("Processing email confirmation with token: {}", token);
+        Locale locale = LocaleContextHolder.getLocale();
+        String templatePath = "internal_pages/";
 
         if (!jwtService.isTokenValid(token, "email-verification")) {
             log.warn("Email verification token is invalid or expired: {}", token);
-            return ResponseEntity.badRequest().body(messageReader.getMessage("auth.confirm_email.invalid_link"));
+            templatePath += "email-verification-failed" + "_" + locale.getLanguage();
+            return templatePath;
         }
 
+        templatePath += "email-confirmed" + "_" + locale.getLanguage();
         String username = jwtService.extractUsername(token);
         userService.activateUser(username);
         log.info("Email verification successful for user: {}", username);
-        return ResponseEntity.ok().build();
+        return templatePath;
     }
 
     @Operation(

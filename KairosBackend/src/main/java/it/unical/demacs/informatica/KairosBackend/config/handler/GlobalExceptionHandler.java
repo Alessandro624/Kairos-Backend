@@ -3,6 +3,8 @@ package it.unical.demacs.informatica.KairosBackend.config.handler;
 import io.swagger.v3.oas.annotations.Hidden;
 import it.unical.demacs.informatica.KairosBackend.config.i18n.MessageReader;
 import it.unical.demacs.informatica.KairosBackend.dto.ServiceError;
+import it.unical.demacs.informatica.KairosBackend.exception.EmailNotSentException;
+import it.unical.demacs.informatica.KairosBackend.exception.RateLimitExceededException;
 import it.unical.demacs.informatica.KairosBackend.exception.ResourceAlreadyExistsException;
 import it.unical.demacs.informatica.KairosBackend.exception.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.web.HttpMediaTypeException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,8 +31,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class GlobalExceptionHandler {
     private final MessageReader messageReader;
-
-    // TODO add missing exceptions and create new custom ones for them.
 
     //FIXME internationalization is not necessary for all the exceptions...
     @ExceptionHandler(Exception.class)
@@ -89,6 +90,13 @@ public class GlobalExceptionHandler {
         return errorResponse(req, ex.getMessage());
     }
 
+    @ExceptionHandler(OAuth2AuthenticationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ServiceError onOAuth2AuthenticationException(WebRequest req, OAuth2AuthenticationException ex) {
+        log.info(messageReader.getMessage("exceptions.oauth2_authentication", ex.getMessage()));
+        return errorResponse(req, ex.getMessage());
+    }
+
     @ExceptionHandler(NoResourceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @Hidden
@@ -110,6 +118,22 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ServiceError onResourceAlreadyExistsException(WebRequest req, ResourceAlreadyExistsException ex) {
         log.info(messageReader.getMessage("exceptions.resource_already_exists", ex.getMessage()));
+        return errorResponse(req, ex.getMessage());
+    }
+
+    @ExceptionHandler(RateLimitExceededException.class)
+    @Hidden
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    public ServiceError onRateLimitExceededException(WebRequest req, RateLimitExceededException ex) {
+        log.info(messageReader.getMessage("exceptions.rate_limit_exceeded", ex.getMessage()));
+        return errorResponse(req, ex.getMessage());
+    }
+
+    @ExceptionHandler(EmailNotSentException.class)
+    @Hidden
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ServiceError onEmailNotSentException(WebRequest req, EmailNotSentException ex) {
+        log.info(messageReader.getMessage("exceptions.email_not_sent", ex.getMessage()));
         return errorResponse(req, ex.getMessage());
     }
 

@@ -2,6 +2,7 @@ package it.unical.demacs.informatica.KairosBackend.data.repository.specification
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.User;
 import it.unical.demacs.informatica.KairosBackend.data.entities.Wishlist;
+import it.unical.demacs.informatica.KairosBackend.data.entities.WishlistUser;
 import it.unical.demacs.informatica.KairosBackend.dto.wishlist.WishlistFilterDTO;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
@@ -22,22 +23,24 @@ public class WishlistSpecifications {
                 predicates.add(cb.like(root.get("name"), "%" + wishlistFilterDTO.getName() + "%"));
 
             //filter by wishlist scope
-            if(wishlistFilterDTO.getWishlistPropertyFilter() != null){
-                //join necessaria in quanto necessito dell'Id del creatore (e non di User, presente in Wishlist!)
-                Join<Wishlist, User> creatorJoin = root.join("creator", JoinType.LEFT);
-                Join<Wishlist, User> sharedUsersJoin = root.join("sharedUsers", JoinType.LEFT);
+            if (wishlistFilterDTO.getWishlistPropertyFilter() != null) {
+                //get my personal wishlists
+                Predicate userOne = cb.equal(root.get("user").get("id"), wishlistFilterDTO.getUserId());
 
-                Predicate owned = cb.equal(creatorJoin.get("id"), wishlistFilterDTO.getUserId());
-                Predicate shared = cb.equal(sharedUsersJoin.get("id"), wishlistFilterDTO.getUserId());
+                //get shared wishlists that have been accepted
+                Join<Wishlist, WishlistUser> usersJoin = root.join("users", JoinType.INNER);
+                Predicate accepted = cb.isTrue(usersJoin.get("accepted"));
+                Predicate userMatch = cb.equal(usersJoin.get("user").get("id"), wishlistFilterDTO.getUserId());
+
+                //get wishlists that are owned and shared
+                Predicate owned = cb.and(userOne, userMatch);
+                Predicate shared = cb.and(accepted, userMatch);
 
                 switch (wishlistFilterDTO.getWishlistPropertyFilter()) {
                     case OWNED -> predicates.add(owned);
                     case SHARED -> predicates.add(shared);
-                    case BOTH -> {
-                        predicates.add(owned);
-                        predicates.add(shared);
-                    }
-                };
+                    case BOTH -> predicates.add(cb.or(owned, shared));
+                }
             }
 
             //pass at least a parameter
@@ -45,6 +48,7 @@ public class WishlistSpecifications {
                 predicates.add(cb.equal(root.get("id"), -1L));
 
 
+            assert cq != null;
             return cq.where(cb.or(predicates.toArray(new Predicate[0])))
                     .distinct(true)
                     .getRestriction();

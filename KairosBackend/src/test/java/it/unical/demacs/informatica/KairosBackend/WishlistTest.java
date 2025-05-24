@@ -2,8 +2,6 @@ package it.unical.demacs.informatica.KairosBackend;
 
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.WishlistScope;
 import it.unical.demacs.informatica.KairosBackend.data.services.WishlistService;
-import it.unical.demacs.informatica.KairosBackend.dto.wishlist.EventWishlistDTO;
-import it.unical.demacs.informatica.KairosBackend.dto.wishlist.UserWishlistDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.wishlist.WishlistCreateDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.wishlist.WishlistDTO;
 import org.apache.commons.csv.CSVFormat;

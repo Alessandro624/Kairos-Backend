@@ -31,6 +31,7 @@ public class Wishlist extends AuditableEntity {
     @Column(nullable=false,length=50)
     private String name;
 
+    //FIXME is it useful?
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private WishlistScope scope;
@@ -48,21 +49,7 @@ public class Wishlist extends AuditableEntity {
     )
     private List<Event> wishedEvents;
 
-    //TODO change into two one-to-many mapping
-    @ManyToMany
-    @JoinTable(
-            name="wishlist_user",
-            joinColumns = @JoinColumn(name="wishlist_id", nullable=false),
-            inverseJoinColumns = @JoinColumn(name="user_id", nullable=false)
-    )
-    private List<User> sharedUsers;
-
-    //TODO add equals() and hashcode() methods in Event class in order to remove these methods.
-    public int containsEvent(Event event) {
-        for(int i = 0; i< wishedEvents.size(); i++)
-            if(wishedEvents.get(i).getId().equals(event.getId()))
-                return i;
-        return -1;
-    }
+    @OneToMany(mappedBy = "wishlist")
+    private List<WishlistUser> sharedUsers;
 }
 

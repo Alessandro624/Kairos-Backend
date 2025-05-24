@@ -73,4 +73,12 @@ public class EmailService {
         variables.put("resetLink", resetLink);
         sendEmailWithTemplate(to, "email.reset.subject", "reset-password", variables);
     }
+
+    public void sendUpdateUserRoleEmail(String to, String username, String newRole) {
+        log.debug("Sending update user role email to '{}'", to);
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("username", username);
+        variables.put("newRole", newRole);
+        sendEmailWithTemplate(to, "email.role_change.subject", "update-role", variables);
+    }
 }

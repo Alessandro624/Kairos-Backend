@@ -151,26 +151,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO makeUserAdmin(UUID userId) {
-        log.info("Making user with id {} an admin", userId);
+    public UserDTO updateUserRole(UUID userId, UserRole role) {
+        log.info("Making user with id {} an {}", userId, role);
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(
                 messageReader.getMessage("user.notfound.id", userId.toString())
         ));
-        user.setRole(UserRole.ADMIN);
+        user.setRole(role);
         User savedUser = userRepository.save(user);
-        log.info("Made user with id {} an admin", userId);
-        return modelMapper.map(savedUser, UserDTO.class);
-    }
-
-    @Override
-    public UserDTO makeUserOrganizer(UUID userId) {
-        log.info("Making user with id {} an organizer", userId);
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(
-                messageReader.getMessage("user.notfound.id", userId.toString())
-        ));
-        user.setRole(UserRole.ORGANIZER);
-        User savedUser = userRepository.save(user);
-        log.info("Made user with id {} an organizer", userId);
+        log.info("Made user with id {} an {}", userId, role);
         return modelMapper.map(savedUser, UserDTO.class);
     }
 

@@ -1,5 +1,6 @@
 package it.unical.demacs.informatica.KairosBackend.data.services;
 
+import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.UserRole;
 import it.unical.demacs.informatica.KairosBackend.dto.user.UserCreateDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.user.UserDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.user.UserUpdateDTO;
@@ -26,9 +27,7 @@ public interface UserService {
 
     void activateUser(String username);
 
-    UserDTO makeUserAdmin(UUID userId);
-
-    UserDTO makeUserOrganizer(UUID userId);
+    UserDTO updateUserRole(UUID userId, UserRole role);
 
     UserDTO createUser(UserCreateDTO userDTO);
 

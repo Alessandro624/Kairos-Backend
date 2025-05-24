@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mise à jour de votre rôle</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+        }
+
+        .header {
+            background-color: #4F46E5;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+
+        .content {
+            padding: 30px;
+            color: #333333;
+            line-height: 1.6;
+        }
+
+        .content p {
+            margin-bottom: 15px;
+        }
+
+        .footer {
+            background-color: #f0f0f0;
+            color: #777777;
+            padding: 20px;
+            text-align: center;
+            font-size: 0.85em;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        a {
+            color: #4F46E5;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h2>Mise à jour de votre rôle</h2>
+    </div>
+    <div class="content">
+        <p>Bonjour <strong th:text="${username}"></strong>,</p>
+        <p>Nous avons le plaisir de vous informer que votre rôle a été mis à jour vers <strong th:text="${newRole}">[Nouveau
+            Rôle]</strong>.</p>
+        <p>Vous avez désormais accès à de nouvelles fonctionnalités en fonction de votre rôle mis à jour.</p>
+        <p>Cordialement,</p>
+        <p>L'équipe Kairos</p>
+    </div>
+    <div class="footer">
+        <p>&copy; 2025 Kairos. Tous droits réservés.</p>
+    </div>
+</div>
+</body>
+</html>

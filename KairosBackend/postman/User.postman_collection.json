@@ -260,7 +260,7 @@
 				"method": "PUT",
 				"header": [],
 				"url": {
-					"raw": "https://localhost:8443/v1/users/{{userId}}/make-admin",
+					"raw": "https://localhost:8443/v1/users/{{userId}}/make-organizer",
 					"protocol": "https",
 					"host": [
 						"localhost"
@@ -270,7 +270,7 @@
 						"v1",
 						"users",
 						"{{userId}}",
-						"make-admin"
+						"make-organizer"
 					]
 				}
 			},

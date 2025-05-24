@@ -13,10 +13,11 @@ import java.util.UUID;
 
 public interface EventService {
     EventDTO getEventById(UUID id);
-    void saveEvent(EventCreateDTO event);
+    EventDTO saveEvent(EventCreateDTO event);
     void deleteEvent(UUID id);
     EventDTO updateEvent(UUID id, EventUpdateDTO eventUpdated);
 
+    Page<EventDTO> getAllEventsGeneral(Pageable pageable);
     Page<EventDTO> getEventsByFilter(EventSpecifications.Filter filter, Pageable pageable);
     Page<EventDTO> getAllEventsFromLocation(String city, String zip, LocalDateTime fromDate, Pageable pageable);
     Page<EventDTO> getAllEventsByOrganizer(UUID userId, Pageable pageable);

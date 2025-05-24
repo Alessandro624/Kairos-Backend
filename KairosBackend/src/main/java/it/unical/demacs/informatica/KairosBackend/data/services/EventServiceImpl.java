@@ -46,6 +46,16 @@ public class EventServiceImpl implements EventService{
         );
     }
 
+    // TODO: improve log
+
+    @Override
+    @Transactional
+    public Page<EventDTO> getAllEventsGeneral(Pageable pageable) {
+        Page<Event> events = eventRepository.findAll(pageable);
+        return events.map(e -> modelMapper.map(e, EventDTO.class));
+    }
+
+
     @Override
     @Transactional(readOnly = true)
     public EventDTO getEventById(UUID id) {
@@ -55,13 +65,13 @@ public class EventServiceImpl implements EventService{
 
     @Override
     @Transactional
-    public void saveEvent(EventCreateDTO event) {
+    public EventDTO saveEvent(EventCreateDTO event) {
         if (existsEvent(event)) {
             throw new ResourceAlreadyExistsException(String.format("Event with title %s, hosted at %s %s by %s already exists", event.getTitle(),
                     event.getStructureId(), event.getDateTime(), event.getOrganizerId()));
         }
         Event newEvent = modelMapper.map(event, Event.class);
-        eventRepository.save(newEvent);
+        return modelMapper.map(eventRepository.save(newEvent), EventDTO.class);
     }
 
     @Override

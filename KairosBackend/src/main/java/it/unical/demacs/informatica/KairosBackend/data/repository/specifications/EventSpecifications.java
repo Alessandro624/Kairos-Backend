@@ -44,10 +44,10 @@ public final class EventSpecifications {
                 predicates.add(criteriaBuilder.equal(root.get("category"), filter.getCategory()));
             }
             if (filter.getFrom() != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("from"), filter.getFrom()));
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("dateTime"), filter.getFrom()));
             }
             if (filter.getTo() != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("to"), filter.getTo()));
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("dateTime"), filter.getTo()));
             }
             if (filter.getOrganizer() != null) {
                 predicates.add(criteriaBuilder.like(root.get("organizer"), searchTermLike(filter.getOrganizer())));

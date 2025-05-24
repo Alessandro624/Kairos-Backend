@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@SuppressWarnings("UnstableApiUsage")
 public class RateLimitingAspect {
     private final RateLimiter rateLimiter;
 

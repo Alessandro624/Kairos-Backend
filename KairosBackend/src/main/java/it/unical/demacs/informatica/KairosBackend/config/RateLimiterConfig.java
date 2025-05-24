@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@SuppressWarnings("UnstableApiUsage")
 public class RateLimiterConfig {
     @Value("${kairos.rate-limiter.permits-per-second}")
     private long requestsPerSecond;

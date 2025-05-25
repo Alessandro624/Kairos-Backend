@@ -47,10 +47,7 @@ public class Event extends AuditableEntity {
     @Column(name = "maxparticipants", nullable = false)
     private int maxParticipants;
 
-    @Column(name = "visible", nullable = false)
-    private boolean isVisible;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_organizer")
     private User organizer;
 

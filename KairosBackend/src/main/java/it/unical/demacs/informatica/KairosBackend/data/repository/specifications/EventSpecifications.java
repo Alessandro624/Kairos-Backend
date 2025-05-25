@@ -1,0 +1,62 @@
+package it.unical.demacs.informatica.KairosBackend.data.repository.specifications;
+
+import it.unical.demacs.informatica.KairosBackend.data.entities.Event;
+import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Category;
+
+import lombok.Data;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.jpa.domain.Specification;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+
+public final class EventSpecifications {
+    private EventSpecifications() {}
+
+    @Data
+    public static class Filter {
+        private String title;
+        private String description;
+        private Category category;
+        private LocalDateTime from;
+        private LocalDateTime to;
+        private String organizer;
+        private String structure;
+    }
+
+    private static String searchTermLike(String p) {
+        return "%" + p + "%";
+    }
+
+    public static Specification<Event> buildSpecification(Filter filter) {
+        return ((root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (filter.getTitle() != null) {
+                predicates.add(criteriaBuilder.like(root.get("title"), searchTermLike(filter.title)));
+            }
+            if (filter.getDescription() != null) {
+                predicates.add(criteriaBuilder.like(root.get("description"), searchTermLike(filter.description)));
+            }
+            if (filter.getCategory() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("category"), filter.getCategory()));
+            }
+            if (filter.getFrom() != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("dateTime"), filter.getFrom()));
+            }
+            if (filter.getTo() != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("dateTime"), filter.getTo()));
+            }
+            if (filter.getOrganizer() != null) {
+                predicates.add(criteriaBuilder.like(root.get("organizer"), searchTermLike(filter.getOrganizer())));
+            }
+            if (filter.getStructure() != null) {
+                predicates.add(criteriaBuilder.like(root.get("structure"), searchTermLike(filter.getStructure())));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        });
+    }
+}

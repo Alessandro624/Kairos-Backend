@@ -13,14 +13,12 @@ import java.util.UUID;
 //USED FOR EDITABLE FIELDS ONLY
 @Data
 public class WishlistUpdateDTO {
-    @NotNull(message = "Id must be defined")
-    private UUID id;
-
     @Size(min = 2, max = 50, message = "Name length must be between 2 and 50.")
     private String name;
 
     private WishlistScope scope;
 
+    //FIXME maybe it's not necessary.
     private List<UUID> wishedEvents;
 
     private List<UUID> sharedUsers;

@@ -35,14 +35,4 @@ public class WishlistDTO {
     private List<UUID> wishedEvents;
 
     private List<UUID> sharedUsers;
-
-    /*used mainly for testing (maybe)
-    public void addWishedEvent(EventWishlistDTO e){
-        wishedEvents.add(e);
-    }
-
-    public void addSharedUser(UserWishlistDTO u){
-        sharedUsers.add(u);
-    }
-     */
 }

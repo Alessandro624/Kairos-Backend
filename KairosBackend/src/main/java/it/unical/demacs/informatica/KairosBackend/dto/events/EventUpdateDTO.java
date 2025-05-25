@@ -34,8 +34,7 @@ public class EventUpdateDTO {
 
     private UUID structureId;
 
-    // TODO: EventSectorDTO is missing
-    // private List<EventSectorDTO> sectors;
+    private List<UUID> sectors;
 
     // can this be null ?
     private List<EventImageCreateDTO> images;

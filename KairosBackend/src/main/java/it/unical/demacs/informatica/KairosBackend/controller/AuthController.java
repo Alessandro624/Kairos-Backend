@@ -162,6 +162,7 @@ public class AuthController {
                     }
                 });
 
+        // to avoid email enumeration, we always send 200 OK
         return ResponseEntity.ok().build();
     }
 

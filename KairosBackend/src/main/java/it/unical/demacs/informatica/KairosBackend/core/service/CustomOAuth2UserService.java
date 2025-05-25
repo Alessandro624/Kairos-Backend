@@ -1,5 +1,6 @@
 package it.unical.demacs.informatica.KairosBackend.core.service;
 
+import it.unical.demacs.informatica.KairosBackend.config.i18n.MessageReader;
 import it.unical.demacs.informatica.KairosBackend.data.entities.User;
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Provider;
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.UserRole;
@@ -24,6 +25,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     private final UserRepository userRepository;
 
     private final DefaultOAuth2UserService defaultOAuth2UserService = new DefaultOAuth2UserService();
+
+    private final MessageReader messageReader;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) {
@@ -67,7 +70,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String email = (String) attributes.get("email");
 
         if (email == null) {
-            throw new OAuth2AuthenticationException("Email not found");
+            throw new OAuth2AuthenticationException(messageReader.getMessage("auth.email_not_found"));
         }
 
         log.debug("Searching for existing user with email: {}", email);
@@ -81,7 +84,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         if (existingUser.getProvider() == provider) {
             return existingUser;
         } else {
-            throw new OAuth2AuthenticationException("User already registered with another provider");
+            throw new OAuth2AuthenticationException(messageReader.getMessage("auth.different_provider"));
         }
     }
 

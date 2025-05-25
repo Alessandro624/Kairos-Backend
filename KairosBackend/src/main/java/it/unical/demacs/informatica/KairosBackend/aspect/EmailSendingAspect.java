@@ -2,6 +2,7 @@ package it.unical.demacs.informatica.KairosBackend.aspect;
 
 import it.unical.demacs.informatica.KairosBackend.core.service.EmailService;
 import it.unical.demacs.informatica.KairosBackend.core.service.JwtService;
+import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.UserRole;
 import it.unical.demacs.informatica.KairosBackend.dto.user.UserDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,25 @@ public class EmailSendingAspect {
 
             log.info("Sending confirmation email to '{}' for user '{}' with link: {}", to, username, confirmationLink);
             emailService.sendConfirmationEmail(to, username, confirmationLink);
+        }
+    }
+
+    @Pointcut("execution(* it.unical.demacs.informatica.KairosBackend.data.services.UserServiceImpl.updateUserRole(..))")
+    public void userRoleUpdateOperation() {
+    }
+
+    @AfterReturning(pointcut = "userRoleUpdateOperation()", returning = "result")
+    public void afterUserRoleUpdate(JoinPoint joinPoint, Object result) {
+        log.info("After update of user role operation with join point: {}", joinPoint);
+        if (result instanceof UserDTO user) {
+            if (user.getRole().equals(UserRole.ADMIN) || user.getRole().equals(UserRole.ORGANIZER)) {
+                String to = user.getEmail();
+                String username = user.getUsername();
+                String newRole = user.getRole().name();
+
+                log.info("User '{}' became '{}'. Sending notification email to '{}'", username, newRole, to);
+                emailService.sendUpdateUserRoleEmail(to, username, newRole);
+            }
         }
     }
 }

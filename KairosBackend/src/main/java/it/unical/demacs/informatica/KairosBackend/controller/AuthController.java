@@ -21,6 +21,7 @@ import it.unical.demacs.informatica.KairosBackend.dto.user.UserCreateDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,6 +31,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/v1/auth", produces = "application/json")
@@ -50,7 +53,7 @@ public class AuthController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Successfully authenticated",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))),
-                    @ApiResponse(responseCode = "400", description = "Invalid credentials",
+                    @ApiResponse(responseCode = "400", description = "Invalid username/email or password",
                             content = @Content(schema = @Schema(implementation = ServiceError.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized",
                             content = @Content(schema = @Schema()))
@@ -58,7 +61,7 @@ public class AuthController {
     )
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Authentication request", required = true,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Authentication request with username/email and password", required = true,
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthRequest.class)))
             @Valid @RequestBody AuthRequest authRequest
     ) {
@@ -92,7 +95,7 @@ public class AuthController {
         log.debug("Processing token refresh request");
         if (!jwtService.isTokenValid(refreshToken, "refresh")) {
             log.warn("Invalid refresh token provided");
-            return ResponseEntity.badRequest().body(messageReader.getMessage("auth.refresh.invalid_token"));
+            return ResponseEntity.badRequest().body(Map.of("message", messageReader.getMessage("auth.refresh.invalid_token")));
         }
         String username = jwtService.extractUsername(refreshToken);
         log.debug("Refresh token valid for user: {}", username);
@@ -106,14 +109,14 @@ public class AuthController {
             summary = "Register new user",
             description = "Registers a new user account.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Successfully registered"),
-                    @ApiResponse(responseCode = "400", description = "Invalid input",
+                    @ApiResponse(responseCode = "201", description = "Successfully registered"),
+                    @ApiResponse(responseCode = "400", description = "Invalid registration details",
                             content = @Content(schema = @Schema(implementation = ServiceError.class)))
             }
     )
     @PostMapping("/register")
     public ResponseEntity<?> register(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "User registration details", required = true,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "User registration details (username, email, password)", required = true,
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserCreateDTO.class)))
             @Valid @RequestBody UserCreateDTO userCreateDTO
     ) {
@@ -122,19 +125,19 @@ public class AuthController {
         userCreateDTO.setRole(UserRole.USER);
         userService.createUser(userCreateDTO);
         log.info("User registration successful for username: {}", userCreateDTO.getUsername());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @Operation(
             summary = "Request password reset",
-            description = "Initiates the password reset process by sending a reset link to the user's email.",
+            description = "Initiates the password reset process by sending a reset link to the user's email if the user exists.",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "User's username or email to send the reset link to", required = true,
+                    description = "User's username or email", required = true,
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = PasswordResetRequest.class))
             ),
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Password reset link sent successfully (or if user not found, to prevent enumeration)"),
+                    @ApiResponse(responseCode = "200", description = "Password reset link sent (if user found)"),
                     @ApiResponse(responseCode = "400", description = "Invalid input",
                             content = @Content(schema = @Schema(implementation = ServiceError.class)))
             }
@@ -154,6 +157,8 @@ public class AuthController {
 
                         log.info("Sending password reset email to '{}'", userDTO.getEmail());
                         emailService.sendPasswordResetEmail(userDTO.getEmail(), userDTO.getUsername(), resetLink);
+                    } else {
+                        log.info("Password reset requested for OAuth2 user '{}', no email sent.", userDTO.getEmail());
                     }
                 });
 
@@ -181,7 +186,7 @@ public class AuthController {
 
         if (!jwtService.isTokenValid(token, "reset-password")) {
             log.warn("Invalid or expired password reset token provided for form display: {}", token);
-            modelAndView.setViewName("internal_pages/password-reset-failed");
+            modelAndView.setViewName("internal_pages/reset-password-failed");
             return modelAndView;
         }
 
@@ -200,27 +205,30 @@ public class AuthController {
                             schema = @Schema(implementation = PasswordResetConfirmation.class))
             ),
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Password successfully reset"),
-                    @ApiResponse(responseCode = "400", description = "Invalid or expired token, or invalid input",
+                    @ApiResponse(responseCode = "200", description = "Password successfully reset",
+                            content = @Content(mediaType = "application/json", schema = @Schema(type = "object", example = "{\"message\": \"Password successfully reset.\"}"))),
+                    @ApiResponse(responseCode = "400", description = "Invalid or expired token, or passwords do not match",
                             content = @Content(schema = @Schema(implementation = ServiceError.class))),
                     @ApiResponse(responseCode = "404", description = "User not found",
                             content = @Content(schema = @Schema(implementation = ServiceError.class)))
             }
     )
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@Valid @RequestBody PasswordResetConfirmation request) {
+    public ResponseEntity<Map<String, String>> resetPassword(@Valid @RequestBody PasswordResetConfirmation request) {
         log.debug("Processing password reset confirmation");
 
         if (!jwtService.isTokenValid(request.getToken(), "reset-password")) {
             log.warn("Invalid or expired password reset token: {}", request.getToken());
-            return ResponseEntity.badRequest().body(messageReader.getMessage("auth.reset_password.invalid_token"));
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", messageReader.getMessage("auth.reset_password.invalid_token")));
         }
 
         String username = jwtService.extractUsername(request.getToken());
 
         userService.resetUserPassword(username, request.getNewPassword());
         log.info("Password successfully reset for user: {}", username);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok()
+                .body(Map.of("message", messageReader.getMessage("auth.reset_password.success_message")));
     }
 
     @Operation(
@@ -270,5 +278,12 @@ public class AuthController {
     public ResponseEntity<String> oAuth2LoginFailure() {
         log.warn("OAuth2 login attempt failed");
         return ResponseEntity.badRequest().body(messageReader.getMessage("auth.oauth2.login_failed"));
+    }
+
+    @GetMapping("/reset-password/success")
+    public ModelAndView resetPasswordSuccess() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("internal_pages/reset-password-success");
+        return modelAndView;
     }
 }

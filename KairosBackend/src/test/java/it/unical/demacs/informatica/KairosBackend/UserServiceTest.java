@@ -328,9 +328,19 @@ public class UserServiceTest {
     public void testMakeUserAdmin() {
         assertNotNull(testUserId, "Test user ID should not be null");
 
-        UserDTO updatedUser = userService.makeUserAdmin(testUserId);
+        UserDTO updatedUser = userService.updateUserRole(testUserId, UserRole.ADMIN);
 
         assertEquals(UserRole.ADMIN, updatedUser.getRole(), "User role should be updated to ADMIN");
+        assertEquals(testUserId, updatedUser.getId(), "User ID should remain the same");
+    }
+
+    @Test
+    public void testMakeUserOrganizer() {
+        assertNotNull(testUserId, "Test user ID should not be null");
+
+        UserDTO updatedUser = userService.updateUserRole(testUserId, UserRole.ORGANIZER);
+
+        assertEquals(UserRole.ORGANIZER, updatedUser.getRole(), "User role should be updated to ORGANIZER");
         assertEquals(testUserId, updatedUser.getId(), "User ID should remain the same");
     }
 

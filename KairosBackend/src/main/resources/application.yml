@@ -2,6 +2,7 @@ security:
   enabled: true
   email-verification: true
   public-endpoints:
+    - /favicon.ico
     - /v1/auth/login
     - /v1/auth/register
     - /v1/auth/oauth2/**
@@ -12,7 +13,7 @@ security:
     - /actuator/**
     - /v1/auth/confirm
     - /v1/auth/forgot-password
-    - /v1/auth/reset-password
+    - /v1/auth/reset-password/**
   protected-routes:
     '[/v1/users]': ROLE_ADMIN
     '[/v1/users/admin]': ROLE_ADMIN

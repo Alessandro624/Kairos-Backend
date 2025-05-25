@@ -47,7 +47,7 @@ public class Event extends AuditableEntity {
     @Column(name = "maxparticipants", nullable = false)
     private int maxParticipants;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_organizer")
     private User organizer;
 
@@ -55,7 +55,7 @@ public class Event extends AuditableEntity {
     @JoinColumn(name = "id_structure")
     private Structure structure;
 
-    @OneToMany(mappedBy = "event")
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EventSector> sectors;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)

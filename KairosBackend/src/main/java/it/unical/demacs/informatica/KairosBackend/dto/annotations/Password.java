@@ -10,8 +10,7 @@ import java.lang.annotation.*;
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Password {
-
-    String message() default "Invalid password";
+    String message() default "";
 
     int min() default 8;
 

@@ -31,17 +31,15 @@ public class EmailService {
         Locale locale = LocaleContextHolder.getLocale();
         Context context = new Context(locale);
         context.setVariables(variables);
-        String templatePath = "email/" + templateName + "_" + locale.getLanguage();
+        String templatePath = "email/" + templateName;
 
         log.info("Preparing to send email to '{}' using template '{}', locale '{}'", to, templatePath, locale);
 
-        String body;
+        String body = "";
         try {
             body = templateEngine.process(templatePath, context);
         } catch (TemplateInputException e) {
-            log.warn("Localized template not found: '{}', falling back to default template '{}'", templatePath, templateName);
-            String fallbackTemplate = "email/" + templateName;
-            body = templateEngine.process(fallbackTemplate, context);
+            log.warn("Localized template not found: '{}'", templatePath);
         }
 
         MimeMessage message = mailSender.createMimeMessage();
@@ -49,12 +47,12 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
             helper.setTo(to);
             helper.setSubject(messageReader.getMessage(subjectKey, locale));
-            helper.setText(body, true); // true = HTML
+            helper.setText(body, true);
             mailSender.send(message);
             log.info("Email sent successfully to '{}'", to);
         } catch (MessagingException e) {
             log.error("Failed to send email to '{}'", to, e);
-            throw new EmailNotSentException("Failed to send email");
+            throw new EmailNotSentException(messageReader.getMessage("email.not_sent.failure"));
         }
     }
 
@@ -72,5 +70,13 @@ public class EmailService {
         variables.put("username", username);
         variables.put("resetLink", resetLink);
         sendEmailWithTemplate(to, "email.reset.subject", "reset-password", variables);
+    }
+
+    public void sendUpdateUserRoleEmail(String to, String username, String newRole) {
+        log.debug("Sending update user role email to '{}'", to);
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("username", username);
+        variables.put("newRole", newRole);
+        sendEmailWithTemplate(to, "email.role_change.subject", "update-role", variables);
     }
 }

@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Username {
-    String message() default "Invalid username";
+    String message() default "";
 
     int min() default 4;
 

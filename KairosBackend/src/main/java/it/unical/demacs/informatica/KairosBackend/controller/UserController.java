@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.unical.demacs.informatica.KairosBackend.config.i18n.MessageReader;
 import it.unical.demacs.informatica.KairosBackend.core.service.AuthService;
+import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.UserRole;
 import it.unical.demacs.informatica.KairosBackend.data.services.UserService;
 import it.unical.demacs.informatica.KairosBackend.dto.ServiceError;
 import it.unical.demacs.informatica.KairosBackend.dto.user.UserDTO;
@@ -176,7 +177,27 @@ public class UserController {
     @PutMapping("/{userId}/make-admin")
     public ResponseEntity<UserDTO> makeUserAdmin(@Parameter(description = "ID of the user to make admin") @PathVariable UUID userId) {
         log.info("Making user with id {} an admin", userId);
-        return ResponseEntity.ok(userService.makeUserAdmin(userId));
+        return ResponseEntity.ok(userService.updateUserRole(userId, UserRole.ADMIN));
+    }
+
+    @Operation(
+            summary = "Make a user an organizer",
+            description = "Elevates a specific user's role to ORGANIZER. Requires ADMIN role.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully made the user an organizer",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized",
+                            content = @Content(schema = @Schema())),
+                    @ApiResponse(responseCode = "403", description = "Forbidden - Requires ORGANIZER role",
+                            content = @Content(schema = @Schema())),
+                    @ApiResponse(responseCode = "404", description = "User not found",
+                            content = @Content(schema = @Schema(implementation = ServiceError.class)))
+            }
+    )
+    @PutMapping("/{userId}/make-organizer")
+    public ResponseEntity<UserDTO> makeUserOrganizer(@Parameter(description = "ID of the user to make organizer") @PathVariable UUID userId) {
+        log.info("Making user with id {} an organizer", userId);
+        return ResponseEntity.ok(userService.updateUserRole(userId, UserRole.ORGANIZER));
     }
 
     @Operation(

@@ -61,8 +61,8 @@ public class User extends AuditableEntity {
     @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Wishlist> createdWishlists;
 
-    @ManyToMany(mappedBy = "sharedUsers")
-    private List<Wishlist> sharedWishlists;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WishlistUser> sharedWishlists;
 
     @OneToMany(mappedBy = "userParticipant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ticket> tickets;

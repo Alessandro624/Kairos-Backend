@@ -18,5 +18,5 @@ REM - PowerShell
 REM - WSL or Git Bash installed
 REM =====================================
 
-powershell -Command "Start-Process cmd -Verb RunAs -ArgumentList '/k cd %cd% && bash kairos-start.sh'"
+powershell -Command "Start-Process cmd -Verb RunAs -ArgumentList '/k cd %cd% && kairos-start.sh'"
 pause

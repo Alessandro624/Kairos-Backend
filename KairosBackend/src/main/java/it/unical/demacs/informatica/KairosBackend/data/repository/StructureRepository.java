@@ -20,11 +20,17 @@ public interface StructureRepository extends
         PagingAndSortingRepository<Structure, UUID>,
         JpaSpecificationExecutor<Structure> {
 
-    @Query("SELECT ss.sector FROM StructureSector ss WHERE ss.structure.id = :structureId")
+    @Query("SELECT sector " +
+            "FROM StructureSector ss, Sector sector " +
+            "WHERE ss.structure.id = :structureId " +
+            "AND sector.id = ss.sector")
     List<SectorDTO> findSectorsByStructureId(@Param("structureId") UUID structureId);
 
-    @Query("SELECT ss.capacity FROM StructureSector ss WHERE ss.structure.id = :structureId AND ss.sector.id = :sectorId")
-    Integer findCapacityByStructureAndSector(@Param("structureId") UUID structureId, @Param("sectorId") UUID sectorId);
+    @Query("SELECT ss.capacity " +
+            "FROM StructureSector ss " +
+            "WHERE ss.structure.id = :structureId " +
+            "AND ss.sector.id = :sectorId")
+    Integer findCapacityByStructureAndSector(@Param("sectorId") UUID sectorId);
 
     StructureDTO findByName(String name);
 }

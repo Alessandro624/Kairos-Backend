@@ -1,5 +1,6 @@
 package it.unical.demacs.informatica.KairosBackend.data.repository;
 
+import it.unical.demacs.informatica.KairosBackend.data.entities.Sector;
 import it.unical.demacs.informatica.KairosBackend.data.entities.Structure;
 import it.unical.demacs.informatica.KairosBackend.dto.sector.SectorDTO;
 import it.unical.demacs.informatica.KairosBackend.dto.structure.StructureDTO;
@@ -23,8 +24,8 @@ public interface StructureRepository extends
     @Query("SELECT sector " +
             "FROM StructureSector ss, Sector sector " +
             "WHERE ss.structure.id = :structureId " +
-            "AND sector.id = ss.sector")
-    List<SectorDTO> findSectorsByStructureId(@Param("structureId") UUID structureId);
+            "AND sector.id = ss.sector.id")
+    List<Sector> findSectorsByStructureId(@Param("structureId") UUID structureId);
 
     @Query("SELECT ss.capacity " +
             "FROM StructureSector ss " +
@@ -32,5 +33,5 @@ public interface StructureRepository extends
             "AND ss.sector.id = :sectorId")
     Integer findCapacityByStructureAndSector(@Param("sectorId") UUID sectorId);
 
-    StructureDTO findByName(String name);
+    Structure findByName(String name);
 }

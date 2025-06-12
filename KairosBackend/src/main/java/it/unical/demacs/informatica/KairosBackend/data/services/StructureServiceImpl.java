@@ -1,5 +1,6 @@
 package it.unical.demacs.informatica.KairosBackend.data.services;
 
+import it.unical.demacs.informatica.KairosBackend.data.entities.Sector;
 import it.unical.demacs.informatica.KairosBackend.data.entities.Structure;
 import it.unical.demacs.informatica.KairosBackend.data.repository.StructureRepository;
 import it.unical.demacs.informatica.KairosBackend.data.repository.specifications.StructureSpecifications;
@@ -27,14 +28,12 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class StructureServiceImpl implements StructureService
-{
+public class StructureServiceImpl implements StructureService {
     private final StructureRepository structureRepository;
     private final ModelMapper modelMapper;
 
     @Override
-    public StructureDetailsDTO findStructureDetailsById(UUID id)
-    {
+    public StructureDetailsDTO findStructureDetailsById(UUID id) {
         Structure structure = structureRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Structure with id: " + id + " not found."));
 
@@ -55,14 +54,13 @@ public class StructureServiceImpl implements StructureService
     }
 
     @Override
-    public List<SectorDTO> findSectorsByStructureId(UUID id)
-    {
-        return structureRepository.findSectorsByStructureId(id);
+    public List<SectorDTO> findSectorsByStructureId(UUID id) {
+        List<Sector> sectors = structureRepository.findSectorsByStructureId(id);
+        return sectors.stream().map(sector -> modelMapper.map(sector, SectorDTO.class)).collect(Collectors.toList());
     }
 
     @Override
-    public StructureDTO create(StructureCreateDTO dto)
-    {
+    public StructureDTO create(StructureCreateDTO dto) {
         Structure structure = modelMapper.map(dto, Structure.class);
         Structure savedStructure = structureRepository.save(structure);
 
@@ -70,20 +68,17 @@ public class StructureServiceImpl implements StructureService
     }
 
     @Override
-    public void deleteById(UUID id)
-    {
-        if (!structureRepository.existsById(id))
-        {
+    public void deleteById(UUID id) {
+        if (!structureRepository.existsById(id)) {
             throw new ResourceNotFoundException("Structure with id: " + id + " not found.");
         }
         structureRepository.deleteById(id);
     }
 
     @Override
-    public StructureDetailsDTO findByName(String name)
-    {
-        StructureDTO structureDTO = structureRepository.findByName(name);
+    public StructureDetailsDTO findByName(String name) {
+        Structure structure = structureRepository.findByName(name);
 
-        return modelMapper.map(structureDTO, StructureDetailsDTO.class);
+        return modelMapper.map(structure, StructureDetailsDTO.class);
     }
 }

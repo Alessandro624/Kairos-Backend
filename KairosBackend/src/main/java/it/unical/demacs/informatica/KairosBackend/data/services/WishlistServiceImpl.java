@@ -39,14 +39,14 @@ public class WishlistServiceImpl implements WishlistService {
 
     @Override
     public WishlistDTO getWishlistById(UUID id) {
-        Wishlist wishlist = wishlistRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Wishlist having id " +id + " doesn't exist"));
+        Wishlist wishlist = wishlistRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Wishlist having id " + id + " doesn't exist"));
 
         return modelMapper.map(wishlist, WishlistDTO.class);
     }
 
     @Override
     public WishlistDTO createWishlist(WishlistCreateDTO wishlistCreateDTO) {
-        if(wishlistRepository.existsByCreator_IdAndName(wishlistCreateDTO.getCreator(), wishlistCreateDTO.getName()))
+        if (wishlistRepository.existsByCreator_IdAndName(wishlistCreateDTO.getCreator(), wishlistCreateDTO.getName()))
             throw new ResourceAlreadyExistsException("Wishlist " + wishlistCreateDTO.getName() + " already exists");
 
         Wishlist wishlist = modelMapper.map(wishlistCreateDTO, Wishlist.class);
@@ -74,11 +74,11 @@ public class WishlistServiceImpl implements WishlistService {
     @Override
     @Transactional
     public WishlistDTO updateWishlist(UUID wishlistId, WishlistUpdateDTO wishlistUpdateDTO) {
-        Wishlist wishlist = wishlistRepository.findById(wishlistId).orElseThrow(() -> new ResourceNotFoundException("Wishlist " + wishlistUpdateDTO.getId() + " doesn't exist"));
+        Wishlist wishlist = wishlistRepository.findById(wishlistId).orElseThrow(() -> new ResourceNotFoundException("Wishlist " + wishlistId + " doesn't exist"));
 
-        if(wishlistRepository.existsByCreator_IdAndName(wishlist.getCreator().getId(), wishlistUpdateDTO.getName()))
+        if (wishlistRepository.existsByCreator_IdAndName(wishlist.getCreator().getId(), wishlistUpdateDTO.getName()))
             //TODO frontend should do a check (maybe a warning)
-            wishlist.setName(wishlistUpdateDTO.getName()+"1");
+            wishlist.setName(wishlistUpdateDTO.getName() + "1");
         else
             wishlist.setName(wishlistUpdateDTO.getName());
         wishlist.setScope(wishlistUpdateDTO.getScope());
@@ -100,9 +100,10 @@ public class WishlistServiceImpl implements WishlistService {
         Wishlist wishlist = wishlistRepository.findById(wishlistId).orElseThrow(() -> new ResourceNotFoundException("Wishlist " + wishlistId + " doesn't exist"));
 
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User " + userId + " doesn't exist"));
-        if(wishlist.getSharedUsers().contains(user)) throw new ResourceAlreadyExistsException("Wishlist "+ wishlistId+" is already shared to User" + userId);
+        if (wishlist.getSharedUsers().contains(user))
+            throw new ResourceAlreadyExistsException("Wishlist " + wishlistId + " is already shared to User" + userId);
 
-        if(wishlist.getScope() == WishlistScope.PRIVATE)
+        if (wishlist.getScope() == WishlistScope.PRIVATE)
             wishlist.setScope(WishlistScope.SHARED);
 
         WishlistUser wu = new WishlistUser();
@@ -115,7 +116,7 @@ public class WishlistServiceImpl implements WishlistService {
         wishlist.getSharedUsers().add(wu);
 
         //TODO add email, or some notification system to notify added user.
-        Wishlist saved =  wishlistRepository.save(wishlist);
+        Wishlist saved = wishlistRepository.save(wishlist);
 
         return modelMapper.map(saved, WishlistDTO.class);
     }
@@ -125,13 +126,14 @@ public class WishlistServiceImpl implements WishlistService {
     public void removeUserFromWishlist(UUID wishlistId, UUID userId) {
         Wishlist wishlist = wishlistRepository.findById(wishlistId).orElseThrow(() -> new ResourceNotFoundException("Wishlist " + wishlistId + " doesn't exist"));
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User " + userId + " doesn't exist"));
-        WishlistUser wishlistUser = wishlistUserRepository.findByUserAndWishlist(user,wishlist).orElseThrow(() -> new ResourceNotFoundException("Wishlist " + wishlistId + " isn't shared with user " + userId));
+        WishlistUser wishlistUser = wishlistUserRepository.findByUserAndWishlist(user, wishlist).orElseThrow(() -> new ResourceNotFoundException("Wishlist " + wishlistId + " isn't shared with user " + userId));
 
-        if(!wishlist.getSharedUsers().contains(wishlistUser)) throw new ResourceNotFoundException("No User " + userId + "found in Wishlist" + wishlistId);
+        if (!wishlist.getSharedUsers().contains(wishlistUser))
+            throw new ResourceNotFoundException("No User " + userId + "found in Wishlist" + wishlistId);
         wishlist.getSharedUsers().remove(wishlistUser);
 
         //change wishlist state if it was the only element of the list.
-        if(wishlist.getSharedUsers().isEmpty())
+        if (wishlist.getSharedUsers().isEmpty())
             wishlist.setScope(WishlistScope.PRIVATE);
 
         //TODO add email, or some notification system to notify removed user.
@@ -143,13 +145,14 @@ public class WishlistServiceImpl implements WishlistService {
         Wishlist wishlist = wishlistRepository.findById(wishlistId).orElseThrow(() -> new ResourceNotFoundException("Wishlist " + wishlistId + " doesn't exist"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new ResourceNotFoundException("Event " + eventId + " doesn't exist"));
 
-        if(wishlist.getWishedEvents().contains(event)) throw new ResourceAlreadyExistsException("Wishlist "+ wishlistId+" is already shared to Event" + eventId);
+        if (wishlist.getWishedEvents().contains(event))
+            throw new ResourceAlreadyExistsException("Wishlist " + wishlistId + " is already shared to Event" + eventId);
 
         wishlist.getWishedEvents().add(event);
 
         //TODO add email, or some notification system to notify shared users if wishlist is shared.
 
-        Wishlist saved =  wishlistRepository.save(wishlist);
+        Wishlist saved = wishlistRepository.save(wishlist);
         return modelMapper.map(saved, WishlistDTO.class);
     }
 
@@ -159,7 +162,8 @@ public class WishlistServiceImpl implements WishlistService {
         Wishlist wishlist = wishlistRepository.findById(wishlistId).orElseThrow(() -> new ResourceNotFoundException("Wishlist " + wishlistId + " doesn't exist"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new ResourceNotFoundException("Event " + eventId + " doesn't exist"));
 
-        if(!wishlist.getWishedEvents().contains(event)) throw new ResourceNotFoundException("No Event " + eventId + "found in Wishlist" + wishlistId);
+        if (!wishlist.getWishedEvents().contains(event))
+            throw new ResourceNotFoundException("No Event " + eventId + "found in Wishlist" + wishlistId);
 
         wishlist.getWishedEvents().remove(event);
         //TODO add email, or some notification system to notify shared users if wishlist is shared.
@@ -179,8 +183,8 @@ public class WishlistServiceImpl implements WishlistService {
         //FIXME where to add specification? Here or in WishlistController?
         //in the example is passed as a parameter of service function!
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Wishlist> wishlistsPage = wishlistRepository.findAll(WishlistSpecifications.filterWishlists(wishlistFilterDTO),pageRequest);
+        Page<Wishlist> wishlistsPage = wishlistRepository.findAll(WishlistSpecifications.filterWishlists(wishlistFilterDTO), pageRequest);
 
-        return wishlistsPage.map(wishlist -> modelMapper.map(wishlist,WishlistDTO.class));
+        return wishlistsPage.map(wishlist -> modelMapper.map(wishlist, WishlistDTO.class));
     }
 }

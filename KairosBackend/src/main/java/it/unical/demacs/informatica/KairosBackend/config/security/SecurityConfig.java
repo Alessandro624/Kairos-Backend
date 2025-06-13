@@ -1,6 +1,7 @@
 package it.unical.demacs.informatica.KairosBackend.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.unical.demacs.informatica.KairosBackend.config.CustomOAuth2AuthorizationRequestRepository;
 import it.unical.demacs.informatica.KairosBackend.config.filter.JwtAuthFilter;
 import it.unical.demacs.informatica.KairosBackend.config.filter.KeycloakJwtFilter;
 import it.unical.demacs.informatica.KairosBackend.config.handler.OAuth2AuthenticationHandler;
@@ -48,6 +49,8 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
 
     private final OAuth2AuthenticationHandler oAuth2AuthenticationHandler;
+
+    private final CustomOAuth2AuthorizationRequestRepository oAuth2AuthorizationRequestRepository;
 
     @Value("${spring.security.oauth2.client.provider.keycloak.issuer-uri}")
     private String issuerUri;
@@ -133,7 +136,10 @@ public class SecurityConfig {
                 // OAUTH2 LOGIN HANDLING
                 .oauth2Login(o -> {
                     log.debug("Configuring OAuth2 login handling");
-                    o.authorizationEndpoint(a -> a.baseUri("/v1/auth/oauth2/authorize"));
+                    o.authorizationEndpoint(a -> {
+                        a.baseUri("/v1/auth/oauth2/authorize");
+                        a.authorizationRequestRepository(oAuth2AuthorizationRequestRepository);
+                    });
                     o.redirectionEndpoint(r -> r.baseUri("/v1/auth/oauth2/callback/*"));
                     o.userInfoEndpoint(u -> u.userService(customOAuth2UserService));
                     o.successHandler(oAuth2AuthenticationHandler);

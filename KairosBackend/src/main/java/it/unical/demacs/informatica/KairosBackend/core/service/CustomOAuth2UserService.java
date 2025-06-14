@@ -126,6 +126,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         Set<GrantedAuthority> authorities = new HashSet<>();
         extractRolesFromRealmAccess(claims, authorities);
         extractRolesFromResourceAccess(claims, authorities);
+        extractRolesFromRolesClaim(claims, authorities);
         return authorities;
     }
 
@@ -150,6 +151,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 }
             });
         }
+    }
+
+    private void extractRolesFromRolesClaim(Map<String, Object> claims, Set<GrantedAuthority> authorities) {
+        log.debug("Processing roles from roles claim");
+        List<String> roles = getList(claims);
+        addRoles(roles, authorities);
     }
 
     private void addRoles(List<String> roles, Set<GrantedAuthority> authorities) {

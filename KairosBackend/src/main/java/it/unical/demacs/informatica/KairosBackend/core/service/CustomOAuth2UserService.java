@@ -1,5 +1,6 @@
 package it.unical.demacs.informatica.KairosBackend.core.service;
 
+import it.unical.demacs.informatica.KairosBackend.config.CacheConfig;
 import it.unical.demacs.informatica.KairosBackend.config.i18n.MessageReader;
 import it.unical.demacs.informatica.KairosBackend.data.entities.User;
 import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.Provider;
@@ -7,6 +8,7 @@ import it.unical.demacs.informatica.KairosBackend.data.entities.enumerated.UserR
 import it.unical.demacs.informatica.KairosBackend.data.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -15,6 +17,7 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -65,6 +68,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         };
     }
 
+    @Transactional
+    @CacheEvict(value = CacheConfig.CACHE_FOR_USER, allEntries = true)
     public User getUserByOAuth2User(Map<String, Object> attributes, Provider provider) {
         log.debug("Processing OAuth2 user attributes");
         String email = (String) attributes.get("email");

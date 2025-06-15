@@ -78,6 +78,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @CacheEvict(value = CacheConfig.CACHE_FOR_USER, allEntries = true)
     public UserDTO updateUser(UUID userId, UserUpdateDTO userDTO) {
         log.info("Updating user with id {}", userId);
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(
@@ -95,6 +96,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @CacheEvict(value = CacheConfig.CACHE_FOR_USER, allEntries = true)
     public void updateUserPassword(UUID userId, String oldPassword, String newPassword) {
         log.info("Updating password for user with id {}", userId);
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(
@@ -116,6 +118,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @CacheEvict(value = CacheConfig.CACHE_FOR_USER, allEntries = true)
     public void resetUserPassword(String username, String newPassword) {
         log.info("Resetting password for user: {}", username);
         User user = userRepository.findByUsername(username)
@@ -136,6 +139,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @CacheEvict(value = CacheConfig.CACHE_FOR_USER, allEntries = true)
     public void activateUser(String username) {
         log.info("Activating user with username {}", username);
         User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException(
@@ -151,6 +155,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
+    @CacheEvict(value = CacheConfig.CACHE_FOR_USER, allEntries = true)
     public UserDTO updateUserRole(UUID userId, UserRole role) {
         log.info("Making user with id {} an {}", userId, role);
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(
@@ -163,6 +169,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
+    @CacheEvict(value = CacheConfig.CACHE_FOR_USER, allEntries = true)
     public UserDTO createUser(UserCreateDTO userDTO) {
         log.info("Creating user {}", userDTO);
         if (userRepository.existsByUsername(userDTO.getUsername())) {
@@ -229,6 +237,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     @Scheduled(fixedDelayString = "${kairos.cleanup.email-verification.delay}", initialDelayString = "${kairos.cleanup.email-verification.initial-delay}")
+    @CacheEvict(value = CacheConfig.CACHE_FOR_USER, allEntries = true)
     public void cleanUpUnverifiedUsers() {
         log.info("Starting cleanup of unverified user accounts");
 

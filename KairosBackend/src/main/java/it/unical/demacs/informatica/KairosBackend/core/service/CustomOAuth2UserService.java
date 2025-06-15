@@ -94,8 +94,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         user.setEmail(email);
         user.setUsername(email.split("@")[0]);
         user.setPassword(UUID.randomUUID().toString());
-        user.setFirstName(attributes.get("given_name").toString());
-        user.setLastName(attributes.get("family_name").toString());
+        user.setFirstName(Optional.ofNullable(attributes.get("given_name")).map(Object::toString).orElse("N/A"));
+        user.setLastName(Optional.ofNullable(attributes.get("family_name")).map(Object::toString).orElse("N/A"));
         user.setEmailVerified(true);
         user.setProvider(provider);
         user.setRole(extractUserRole(extractRoles(attributes)));

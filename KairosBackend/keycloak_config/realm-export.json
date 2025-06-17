@@ -757,7 +757,8 @@
         "https://www.getpostman.com/oauth2/callback",
         "http://localhost:8080/*",
         "http://localhost:4200/*",
-        "https://localhost:8443/*"
+        "https://localhost:8443/*",
+        "http://10.0.2.2:8080/*"
       ],
       "webOrigins": [
         "+"

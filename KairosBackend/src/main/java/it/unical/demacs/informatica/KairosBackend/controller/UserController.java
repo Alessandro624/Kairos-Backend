@@ -100,6 +100,7 @@ public class UserController {
             }
     )
     @DeleteMapping("/{userId}")
+    @PreAuthorize("#userId != @authService.getCurrentUserId()")
     public ResponseEntity<Void> deleteUser(@Parameter(description = "ID of the user to delete") @PathVariable UUID userId) {
         log.info("Deleting user with id {}", userId);
         userService.deleteUser(userId);
@@ -175,6 +176,7 @@ public class UserController {
             }
     )
     @PutMapping("/{userId}/make-admin")
+    @PreAuthorize("#userId != @authService.getCurrentUserId()")
     public ResponseEntity<UserDTO> makeUserAdmin(@Parameter(description = "ID of the user to make admin") @PathVariable UUID userId) {
         log.info("Making user with id {} an admin", userId);
         return ResponseEntity.ok(userService.updateUserRole(userId, UserRole.ADMIN));
@@ -195,6 +197,7 @@ public class UserController {
             }
     )
     @PutMapping("/{userId}/make-organizer")
+    @PreAuthorize("#userId != @authService.getCurrentUserId()")
     public ResponseEntity<UserDTO> makeUserOrganizer(@Parameter(description = "ID of the user to make organizer") @PathVariable UUID userId) {
         log.info("Making user with id {} an organizer", userId);
         return ResponseEntity.ok(userService.updateUserRole(userId, UserRole.ORGANIZER));
